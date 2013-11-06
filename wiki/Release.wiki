@@ -1,0 +1,14 @@
+#sidebar Menu
+#summary Release of BagaOSD
+
+=== BagaOSD ===
+|| *Date* || *File* || *Size* || *Label* ||
+|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0 BagaOSD_V1.0]|| 753 Ko || Stable ||
+
+=== MinimOSD Config tool ===
+|| *Date* || *File* || *Size* || *Label* ||
+|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.1.2.0_20131106.zip Config_tool_v2.1.2.0_20131106.zip]|| 505 Ko || Stable ||
+
+=== MinimOSD ===
+|| *Date* || *File* || *Size* || *Label* ||
+|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.0 MinimOSD_V2.0]|| 766 Ko || Stable ||

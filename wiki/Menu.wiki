@@ -6,3 +6,4 @@
   * [Parameter Arduino parameter]
   * [ShoppingList Product used to build BagaOSD]
   * [Build BagaOSD picture]
+  * [Release BagaOSD download]
