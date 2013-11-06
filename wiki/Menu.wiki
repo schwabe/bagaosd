@@ -1,0 +1,8 @@
+#sidebar Menu
+
+* [Index Introduction]
+  * [Detail BagaOSD description]
+  * [HowTo HOWTO build your BagaOSD]
+  * [Parameter Arduino parameter]
+  * [ShoppingList Product used to build BagaOSD]
+  * [Build BagaOSD picture]

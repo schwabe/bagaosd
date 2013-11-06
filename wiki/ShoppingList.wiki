@@ -1,0 +1,37 @@
+#summary Shopping list to build your own BagaOSD
+
+==List of item you can purchase to build your BagaOSD ==
+
+
+Arduino Pro Mini 328 - 5V/16MHz
+ * https://www.sparkfun.com/products/11113
+
+
+Minim OSD v1.1
+ * http://hobbyking.com/hobbyking/store/__36844__Minim_OSD_v1_1.html
+
+
+3cm Male to Male Servo Lead 26AWG
+ * http://hobbyking.com/hobbyking/store/__23036__3cm_Male_to_Male_Servo_Lead_26AWG_10pcs_set_.html
+
+
+Turnigy Heat Shrink Tube 20mm Transparent (1mtr)
+ * http://hobbyking.com/hobbyking/store/__13838__Turnigy_Heat_Shrink_Tube_20mm_Transparent_1mtr_.html
+
+
+Peel-n-stick foam double sided tape 10x5inch 4mm thick
+ * http://hobbyking.com/hobbyking/store/__8999__Peel_n_stick_foam_double_sided_tape_10x5inch_4mm_thick.html
+
+
+FrSky Battery Voltage Sensor
+ * http://hobbyking.com/hobbyking/store/__16671__FrSky_Battery_Voltage_Sensor_FrSky_Telemetry_System_.html
+
+
+AttoPilot Voltage and Current Sense Breakout
+ * https://www.sparkfun.com/products/10644 (180A)
+ * https://www.sparkfun.com/products/9028 (90A)
+ * https://www.sparkfun.com/products/10643 (45A)
+
+
+Break Away Male Headers - Right Angle
+ * https://www.sparkfun.com/products/553
