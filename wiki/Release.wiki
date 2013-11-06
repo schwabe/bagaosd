@@ -3,7 +3,7 @@
 
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0.zip BagaOSD_V1.0]|| 753 Ko || Stable ||
+|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0.zip BagaOSD_V1.0.zip]|| 753 Ko || Stable ||
 
 
 === MinimOSD Config tool ===
@@ -12,4 +12,4 @@
 
 === MinimOSD ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.0.zip MinimOSD_V2.0]|| 766 Ko || Stable ||
+|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.0.zip MinimOSD_V2.0.zip]|| 766 Ko || Stable ||
