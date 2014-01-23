@@ -6,7 +6,12 @@
   Refer to naza_decoder_wiring.jpg diagram for proper connection
 
 . The RC PWM input code taken from https://www.instructables.com/id/RC-Quadrotor-Helicopter/step12/Arduino-Demo-PWM-Input/
+
+
+  Airmamaf : This version is a modified version to meet BagaOSD needs
+  Original version can be found here http://www.rcgroups.com/forums/showthread.php?t=1995704
 */
+
 
 //Airmamaf : Disable PWM analyse, this part is done elsewhere
 #ifndef NazaDecoderLib_h
