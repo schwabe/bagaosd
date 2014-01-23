@@ -1,10 +1,10 @@
 #summary Configuration detail
 ----
-== Common configuration ==
+= Common configuration =
 Common configuration between PPM Sum and standard receiver.
 
 
-=== DJI Naza GPS ===
+== DJI Naza GPS ==
 
 If you need to display the following things :
 
@@ -16,13 +16,16 @@ If you need to display the following things :
  * Ground speed
  * Home direction (accurate information only when copter is moving)
 
-You have to connect the DJI Naza GPS to the RX pin of the Arduino. For this you should plug the GPS wire you have soldered to the RX of Arduino.
+You have to connect the DJI Naza GPS to the *pin 8* of the Arduino. For this you should plug the GPS wire you have soldered to the *pin 8* of Arduino.
 The easiest way to do that, is to plug this wire directly to "connection cable" you made. 
 
-*Please note that you should disconnect the GPS wire of the Arduino board when you are uploading the code*
+You have two options to get GPS Naza data :
+
+ # [uBloxSolder Solder] a wire directely on the GPS Naza
+ # Build an [NazaConnector adapter] to directely get GPS Naza information, and keep Naza GPS connected to Naza Main Controller 
 
 
-=== DJI Naza output ===
+== DJI Naza gimbal output ==
 
 If you need to display an artificial horizon
 
@@ -33,7 +36,7 @@ If you don't use any gimbal connected to your DJI Naza, and you want to display 
 You may have to adjust the gimbal gain of your DJI Naza, to have a proper display. For exemple you can set _pitch gain to 12 and roll gain to 8_
 
 
-=== Current Sensor ===
+== Current Sensor ==
 
 If you need to display the following things :
 
@@ -42,8 +45,14 @@ If you need to display the following things :
 
 Connect current sensor to pin A3, if you want to display current information. *Please notice, that current sensor output should not be above 5V*
 
+If you're flying with a [http://team-blacksheep.com TBS Discovery Frame] you can use the current sensor coming in standard with this frame.
+The parameter configuration is
+{{{
+#define CURRENT_FACTOR             2.05  
+}}}
 
-=== Voltage Sensor ===
+
+== Voltage Sensor ==
 
 If you need to display the following things :
 
@@ -51,18 +60,18 @@ If you need to display the following things :
  * Estimate battery remaining 
 
 Connect voltage sensor to pin A0, if you want to display voltage information. *Please notice, that voltage information should be lower than 5V*, so you have to use a voltage sensor (voltage divider).
-If you don't have any voltage sensor, you can build it with resistors (http://en.wikipedia.org/wiki/Voltage_divider) or you can use a cheap one, for exemple the FrSky Battery Voltage Sensor.
+If you don't have any voltage sensor, you can build it with resistors ([http://en.wikipedia.org/wiki/Voltage_divider Voltage divider]) or you can use a cheap one, for exemple the !FrSky Battery Voltage Sensor.
 Be careful, and check that voltage sensor output *should not be above 5V*
 
 
-=== RSSI ===
+== RSSI ==
 
-RSSI information can be displayed from an analog source or a PWM source (like FrSky receiver)
+RSSI information can be displayed from an analog source or a PWM source (like !FrSky receiver)
 
 If your RSSI source is analog then connect it to PIN A2 (*be careful this source shouldn't provide voltage above 5V*), if it's numerical connect it to PIN 12.
 
 ----
-== Specific configuration ==
+= Specific configuration =
 
 If you need to display the following things :
 
@@ -73,11 +82,11 @@ If you need to display the following things :
 Please note that PIN receiver assignment can't be change.
 
 
-=== Standard receiver ===
+== Standard receiver ==
 
 Connect receiver throttle wire to PIN 2 (Throttle percent / Flight time) and flight mode wire (normally this information come from receiver channel 5) to PIN 7
 
 
-=== PPM receiver ===
+== PPM receiver ==
 
 Connect receiver PPM wire to PIN 2

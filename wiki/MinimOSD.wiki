@@ -1,0 +1,22 @@
+#summary Information about MinimOSD
+
+==What should I know about MinimOSD configuration ==
+
+The [HowTo arduino part] is only used to compute different sensors informations, those informations are displayed thru MinimOSD.
+In order to display those informations, you should upload [http://code.google.com/p/minimosd-extra/ minimosd-extra] code to your MinimOSD device.
+
+Please use the minimosd-extra [http://code.google.com/p/minimosd-extra/wiki/index wiki], to get all information needed about how to upload code, how to configure, ...
+
+BagaOSD come with a slighly modified version of minimosd-extra, BagaOSD use MavLINK 1.0 to comunicate with MinimOSD, so all upcoming version of minimosd-extra should be usable.
+
+
+List of things modified in the minimosd-extra version coming with BagaOSD :
+
+ * GPS HDOP horizontal (GPS quality signal) 
+ * Battery picture (6 positions)
+ * Display RSSI with also a signal bar
+ * "atti" mode is displayed instead of  "alth" (osd_mode 2)
+ * "gpsa" mode is displayed instead of  "loit" (osd_mode 5)
+ * "fail" mode is displayed instead of  "retl" (osd_mode 6)
+
+To display RSSI Signal bar, you should uncheck "RSSI Enable Raw" in the config panel of minimosd-extra config tool.

@@ -18,15 +18,20 @@ There are several steps to build your BagaOSD :
 Just glue 2 male to male servo lead together. You need a +5V wire (red), a ground wire (black) an one wire for communication (white), you can remove the other wire you don't need.
 See picture below for the result of the connection cable
 
-http://bagaosd.googlecode.com/svn/files/cable_info.png
-http://bagaosd.googlecode.com/svn/files/minimosd-arduino.png
+[http://bagaosd.googlecode.com/svn/files/cable_info.jpg]
+
+[http://bagaosd.googlecode.com/svn/files/minimosd-connection.jpg]
 
 ----
 = How to get DJI Naza GPS information =
 
-You have unscrew the Naza GPS to open it (be careful not to lose any screw), after you can solder a wire on the second pin to get the GPS serial information.
-
-http://bagaosd.googlecode.com/svn/files/gps-naza_2pin.png
+ * You can either [uBloxSolder solder] a wire directely to the GPS to decode raw uBlox message
+ * Or use an [NazaConnector adaptor] to get DJI Naza message
+ 
+Change the following parameter according to your configuration
+{{{
+#define DECODE_NAZA_GPS            TRUE  //TRUE : Decode Naza GPS Protocol - FALSE : Solder a wire and decode RAW uBlox Message
+}}}
 
 ----
 = How to prepare your Arduino board =
@@ -44,7 +49,7 @@ All the configuration is done in a single file "config.h". Of course you can cha
 || 7 || FMode (Flight mode : Acro / Atti / Gps / Failsafe) - Flight Mode ||
 
 === Arduino with standard receiver ===
-http://bagaosd.googlecode.com/svn/files/arduino_std.png
+[http://bagaosd.googlecode.com/svn/files/arduino_std.png]
 
 
 
@@ -55,7 +60,7 @@ http://bagaosd.googlecode.com/svn/files/arduino_std.png
 || 5 || Gimbal pitch for horizon display (it's not a PPM Sum signal)|| 
 
 === Arduino with PPM Sum receiver ===
-http://bagaosd.googlecode.com/svn/files/arduino_ppm.png
+[http://bagaosd.googlecode.com/svn/files/arduino_ppm.png]
 
 
 == RSSI Configuration ==

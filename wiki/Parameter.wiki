@@ -26,7 +26,10 @@ Set the numerical PIN number (default 12) if you are using PWM RSSI source (nume
 
 
 {{{
-#define RSSI_PWM_BUFFER            32
+#define RSSI_RC_FILTER             8000    //RSSI constant to analyse PWM RSSI signal 
+#define RSSI_RSSI_MAX              135      //RSSI Max signal value
+#define RSSI_SCALE_MIN             3.5       //Min value for Sigmoid function
+#define RSSI_SCALE_MAX             -2      //Max value for Sigmoid function
 }}}
 Internal buffer to smooth PWM RSSI signal. Only used if RSSI_USE_PWM is ENABLED
 
@@ -117,6 +120,21 @@ Number of cell, for estimate capacity (*ESTIMATE_BATTERY_REMAINING*)
 #define LIPO_CAPACITY_MAH          8000
 }}}
 LIPO capacity in mah to dispaly remaining percent of battery (when a current sensor is used and *ESTIMATE_BATTERY_REMAINING* is disabled)
+
+----
+=== GPS Handler ===
+{{{
+#define DECODE_NAZA_GPS            TRUE  //TRUE : Decode Naza GPS Protocol - FALSE : Solder a wire and decode RAW uBlox Message
+}}}
+
+
+----
+=== Throttle limit ===
+{{{
+#define THROTTLE_PWM_MIN           1000
+#define THROTTLE_PWM_MAX           2000
+}}}
+
 
 
 
