@@ -92,6 +92,7 @@ void sendHeartBeat() {
 //Send GPS data
 void sendGpsData() {
   //mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0,gps_utc_time_second, gpsFix, (long)(lat*10000000), (long)(lon*10000000), alt_MSL, vdop,hdop, ground_speed, heading, numsats);
+  //MAVLINK_MSG_ID_GPS_RAW_INT
   mavlink_msg_gps_raw_int_send(
     MAVLINK_COMM_0,
     millis(), 
@@ -136,6 +137,8 @@ void sendAttitude() {
 void sendVfrHud() {
 	//mavlink_msg_vfr_hud_send(mavlink_channel_t chan, float airspeed, float groundspeed, int16_t heading, uint16_t throttle, float alt, float climb)
 	//mavlink_msg_vfr_hud_send(MAVLINK_COMM_0,ground_speed,ground_speed, ground_course, 0, alt_MSL, 0);
+
+        //MAVLINK_MSG_ID_VFR_HUD
 	mavlink_msg_vfr_hud_send(
           MAVLINK_COMM_0,
           ground_speed,
@@ -143,7 +146,7 @@ void sendVfrHud() {
           heading, 
           throttlepercent, 
           alt_MSL, 
-          -climb); //DMD
+          -climb); 
 }
 
 //Sensor information : current, voltage
@@ -158,7 +161,6 @@ void sendSystemStatus() {
 
 //Send RAW channels data and RSSI
 void sendRawChannels() {
-//DMD RSSI informations
 	mavlink_msg_rc_channels_raw_send(
         MAVLINK_COMM_0,
         millis(),

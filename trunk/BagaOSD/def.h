@@ -4,11 +4,11 @@
 #define PCINT_PIN_COUNT            5
 //PORTD : bit 0 and 1 is for TX/RX, shouldn't modify
 #define PCINT_RX_BITS              (1<<2),(1<<4),(1<<5),(1<<6),(1<<7) //Activate pin 2 / 4 / 5 / 6 / 7
-#define RX_PIN_ORDER               GIMBALROLLPIN, GIMBALPITCHPIN, YAWPIN, THROTTLEPIN, FMODEPIN
+#define RX_PIN_ORDER               THROTTLEPIN, GIMBALROLLPIN, GIMBALPITCHPIN, YAWPIN, FMODEPIN
 #define PCINT_RX_PORT              PORTD  //D Port (num. pin from 0 to 7) : Value 0 => Input / Value 1 => Output
 #define PCINT_RX_MASK              PCMSK2 //Enable watch for pin value change
 #define PCIR_PORT_BIT              (1<<2) //PCICR |= (1<<PCIE#), PCIE # is 2 for PORTD (D0-D7), this value enbale interrupt PCMSK2
-#define RX_PC_INTERRUPT            PCINT2_vect
+#define RX_PC_INTERRUPT            PCINT2_vect //D0-D7 = PCINT 16-23 = PCIR2 = PD = PCIE2 = pcmsk2
 #define RX_PCINT_PIN_PORT          PIND
 #define LEDPIN_PINMODE             pinMode (13, OUTPUT);
 #define LEDPIN_TOGGLE              PINB |= 1<<5;     //switch LEDPIN state (digital PIN 13)
@@ -25,11 +25,14 @@
 #define ENABLED                    1
 #define DISABLED                   0
 
+#define TRUE                       1
+#define FALSE                      0
+
 enum STD_ORDERED_CHANNEL_COMPUTE {
-  GIMBALROLL_STD,
-  GIMBALPITCH_STD,
-  YAW_STD,
   THROTTLE_STD,
+  GIMBALROLL_STD, 
+  GIMBALPITCH_STD, 
+  YAW_STD, 
   FMODE_STD
 };
 

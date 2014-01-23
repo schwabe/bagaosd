@@ -83,18 +83,16 @@ void checkFlightMode() {
 
 //Read throttle percent
 void checkThrottle() {
-    float ret = rcDataSTD[THROTTLE_STD] - 1000; //Throttle between [1000;2000] => 0 - 1000
-    ret = ret / 10;
+    float ret = rcDataSTD[THROTTLE_STD] - THROTTLE_PWM_MIN; //Throttle between [1000;2000] => 0 - 1000
+    ret = 100.0 * ret / (THROTTLE_PWM_MAX - THROTTLE_PWM_MIN);
     throttlepercent = constrain(ret, 0, 100);
 }
 
 //Read RSSI value
 void checkRSSI() {
     #if RSSI_USE_PWM == ENABLED
-       int rawrssi = pulseIn(RSSI_PIN_PWM, HIGH, 200);
-       if( rawrssi < 2 ) rawrssi=0;
-       rssi_percent.addValue(constrain(rawrssi * 2,0 ,100) );
-       receiver_rssi = rssi_percent.getAverage(); 
+       rssiFilter.computeSignal(pulseIn(RSSI_PIN_PWM, HIGH, 200));
+       receiver_rssi = rssiFilter.getPercentCurvedSignal();
     #else    
       #if RSSI_PIN_ANALOG != -1  
         float ret = analogRead(RSSI_PIN_ANALOG);
@@ -107,7 +105,8 @@ void checkRSSI() {
 //Read voltage and current
 void checkBattVolt(){ 
   //Voltage sensor
-  int VintervalVCC = readVcc();
+  static int VintervalVCC = -1;
+  if( VintervalVCC == -1) VintervalVCC = readVcc(); //Read internal reference once, otherwise there a problem with "NazaDecoderLib.h"
   VRaw=analogRead(VOLTAGE_PIN);
   
   #if defined(INTERNAL_VOLTAGE_REF)
@@ -126,7 +125,8 @@ void checkBattVolt(){
 
   //Current sensor 
   #if !defined(ESTIMATE_BATTERY_REMAINING) || ESTIMATE_BATTERY_REMAINING != ENABLED
-    int IintervalVCC = readVcc();
+    static int IintervalVCC = -1;
+    if( IintervalVCC == -1) IintervalVCC = readVcc(); //Read internal reference once, otherwise there a problem with "NazaDecoderLib.h"
     IRaw=analogRead(CURRENT_PIN);
     
     #if defined(INTERNAL_VOLTAGE_REF)
@@ -206,6 +206,7 @@ int estimatepower(){
 
 //Read internal Vref, to get accurate value with analogRead
 //http://provideyourown.com/2012/secret-arduino-voltmeter-measure-battery-voltage/
+//http://code.google.com/p/tinkerit/wiki/SecretVoltmeter
 long readVcc() {
   // Read 1.1V reference against AVcc
   // set the reference to Vcc and the measurement to the internal 1.1V reference
