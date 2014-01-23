@@ -1,29 +1,5 @@
+#include "NazaDecoderLib.h"
 
-
-
-
-
-/*GPS variables*/
-int gpsFix=1;
-float lat=0;
-float lon=0;
-float alt_MSL=0;
-long iTOW=0;
-float alt=0;
-short hdop=9999;
-short vdop=9999;
-float speed_3d=0;
-float ground_speed=0;
-float heading=90;
-float climb=0;
-char data_update_event=0;
-short time_year=0;
-int time_month=0;
-int time_day=0;
-int time_hour=0;
-int time_minute=0;
-int time_second=0;
-byte numsats=0;
 byte ck_a=0;
 byte ck_b=0;
 byte GPS_step=0;
@@ -42,7 +18,44 @@ float origin_alt=0;
 
 //long gps_utc_time_second=0;
 
-void decode_gps(void)
+void decode_gps(void) {
+#if !defined(DEBUG_SENSOR) && !defined(DEBUG_LOOP) 
+    #if defined(DECODE_NAZA_GPS) && DECODE_NAZA_GPS == TRUE
+        decode_gps_naza();
+    #else
+        decode_gps_raw();
+    #endif
+#endif
+}
+
+void decode_gps_naza(void) {
+    if(Serial.available() > 0)
+  {
+    uint8_t decodedMessage = NazaDecoder.decode(Serial.read()); 
+    
+    switch (decodedMessage)
+    {
+      case NAZA_MESSAGE_GPS:
+        gpsFix          = NazaDecoder.getFixType();
+        lon             = NazaDecoder.getLon();
+	lat             = NazaDecoder.getLat();
+        alt             = NazaDecoder.getAlt();
+        alt_MSL         = alt; //This information is not set in NazaDecoder lib, so we use alt instead
+        vdop            = NazaDecoder.getVdop();
+        hdop            = NazaDecoder.getHdop();
+        ground_speed    = NazaDecoder.getSpeed();
+        numsats         = NazaDecoder.getNumSat();
+        climb           = NazaDecoder.getClimbSpeed();
+        break;
+      case NAZA_MESSAGE_COMPASS:
+        heading         = NazaDecoder.getHeading();
+        break;
+    }
+  }
+}
+
+
+void decode_gps_raw(void)
 {
 	static unsigned long GPS_timer=0;
 	byte data;
@@ -135,7 +148,7 @@ void parse_ubx_gps()
 		/*if(height_above_takeoff){
 			alt     = alt - origin_alt;
 			alt_MSL = alt_MSL - origin_alt;
-                        if( origin_lat !=0 && abs(alt_MSL) > 3000 ) { //DMD pb sometimes alt_MSL badely set
+                        if( origin_lat !=0 && abs(alt_MSL) > 3000 ) { //pb sometimes alt_MSL badely set
                           origin_alt = current_alt;
                           alt_MSL = 0;
                         }
@@ -155,7 +168,7 @@ void parse_ubx_gps()
     		}
              }
         
-            //DMD : get GPS time
+            //get GPS time
             //if( gps_flags & 0x01000 ) { //Forth bit to 1, then Time of Week valid 
             //    utc_time_milli = (uint64_t)join_4_bytes(&UBX_buffer[0]);
     	    //}
@@ -169,14 +182,14 @@ void parse_ubx_gps()
 		vdop=(short)join_2_bytes(&UBX_buffer[10]);  //in CM?
 	}
 	if(UBX_id==0x12){ // ID NAV-VELNED
-	    climb         = (float)join_4_bytes(&UBX_buffer[12])/100.0; //DMD
+	    climb         = (float)join_4_bytes(&UBX_buffer[12])/100.0; 
 		speed_3d      = (float)join_4_bytes(&UBX_buffer[16])/100.0;
 		ground_speed  = (float)join_4_bytes(&UBX_buffer[20])/100.0;
 		heading       = (float)join_4_bytes(&UBX_buffer[24])/100000.0;
 	}
 	if(UBX_id==0x21){ // ID NAV-TIMEUTC
-	    byte time_flags = UBX_buffer[19]; //DMD
-	    if( time_flags & 0x01 ) { //DMD : First bit : 1 = Valid Time of Week
+	    byte time_flags = UBX_buffer[19]; 
+	    if( time_flags & 0x01 ) { //First bit : 1 = Valid Time of Week
     		time_month  = join_1_bytes(&UBX_buffer[14]);
     		time_day    = join_1_bytes(&UBX_buffer[15]);
     		time_year   = join_2_bytes(&UBX_buffer[12]);

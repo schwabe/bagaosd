@@ -2,8 +2,12 @@
 #define RSSI_USE_PWM               ENABLED     //Use PWM to decode RSSI signal. This can be commented to use instead analog RSS
 
 //RSSI PWM config
-#define RSSI_PIN_PWM               12   //RSSI PWM digital pin number 
-#define RSSI_PWM_BUFFER            32   //Internal buffer to smooth PWM RSSI signal
+#define RSSI_PIN_PWM               12       //RSSI PWM digital pin number 
+#define RSSI_RC_FILTER             8000    //RSSI constant to analyse PWM RSSI signal (https://sites.google.com/site/arduinorccar/lowpassfilter)
+#define RSSI_RSSI_MAX              135      //RSSI Max signal value
+#define RSSI_SCALE_MIN             3.5       //Min value for Sigmoid function
+#define RSSI_SCALE_MAX             -2      //Max value for Sigmoid function
+
 
 //RSSI Analog config
 #define RSSI_PIN_ANALOG            A2   //RSSI_USE_PWM must be disabled to use it. -1 to disable, or A0, A1, A2, A3 (default A2)
@@ -29,6 +33,14 @@
 //#define ESTIMATE_BATTERY_REMAINING  ENABLED   //Commented to use a current sensor, current sensor is not used if uncommented.
 #define LIPO_CELL                  4     //Number of cell, for estimate capacity (ESTIMATE_BATTERY_REMAINING)
 #define LIPO_CAPACITY_MAH          8000  //LIPO capacity in mah
+
+//GPS Handler
+#define DECODE_NAZA_GPS            TRUE  //TRUE : Decode Naza GPS Protocol - FALSE : Solder a wire and decode RAW uBlox Message
+
+//Throttle
+#define THROTTLE_PWM_MIN           1000
+#define THROTTLE_PWM_MAX           2000
+
 
 /**
 Standard receiver configuration

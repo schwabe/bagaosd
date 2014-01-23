@@ -1,6 +1,5 @@
 volatile uint16_t rcValueSTD[RC_CHANS_STD] = {1502, 1502, 1502, 1502, 1502}; // interval [1000;2000]
-static uint8_t rcChannelSTD[RC_CHANS_STD]  = {RX_PIN_ORDER};
-static uint8_t PCInt_RX_Pins[PCINT_PIN_COUNT] = {PCINT_RX_BITS}; // if this slowes the PCINT readings we can switch to a define for each pcint bit
+static uint8_t PCInt_RX_Pins[PCINT_PIN_COUNT] = {PCINT_RX_BITS}; //pin 2 / 4 / 5 / 6 / 7 // if this slowes the PCINT readings we can switch to a define for each pcint bit
 
 volatile uint16_t rcValuePPM[RC_CHANS_PPM] = {1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502}; // interval [1000;2000]
 static uint8_t rcChannelPPM[RC_CHANS_PPM] = {SERIAL_SUM_PPM};
@@ -21,13 +20,14 @@ void configureReceiver() {
     PCICR = PCIR_PORT_BIT;  //Enable interrupt for watching change values
 }
 
-
-#define RX_PIN_CHECK(pin_pos, rc_value_pos)                        \
+//Mask: changing pin
+//Pin : state of all the pin
+#define RX_PIN_CHECK(pin_pos)                        \
 if (mask & PCInt_RX_Pins[pin_pos]) {                             \
   if (!(pin & PCInt_RX_Pins[pin_pos])) {                         \
     dTime = cTime-edgeTime[pin_pos];                             \
     if (900<dTime && dTime<2200) {                               \
-      rcValueSTD[rc_value_pos] = dTime;                             \
+      rcValueSTD[pin_pos] = dTime;                             \
     }                                                            \
   } else edgeTime[pin_pos] = cTime;                              \
 }
@@ -37,7 +37,7 @@ ISR(RX_PC_INTERRUPT) { //this ISR is common to every receiver channel, it is cal
   uint8_t mask;
   uint8_t pin;
   uint16_t cTime,dTime;
-  static uint16_t edgeTime[RC_CHANS_STD];
+  static uint16_t edgeTime[RC_CHANS_STD]; //5
   static uint8_t PCintLast;
 
   pin = RX_PCINT_PIN_PORT; // RX_PCINT_PIN_PORT indicates the state of each PIN for the arduino port dealing with Ports digital pins
@@ -46,35 +46,32 @@ ISR(RX_PC_INTERRUPT) { //this ISR is common to every receiver channel, it is cal
   cTime = micros();         // micros() return a uint32_t, but it is not usefull to keep the whole bits => we keep only 16 bits
   sei();                    // re enable other interrupts at this point, the rest of this interrupt is not so time critical and can be interrupted safely
   PCintLast = pin;          // we memorize the current state of all PINs [D0-D7]
-/*
-  RX_PIN_CHECK(0, THROTTLEPIN);
-  RX_PIN_CHECK(1, GIMBALROLLPIN);
-  RX_PIN_CHECK(2, GIMBALPITCHPIN);
-  RX_PIN_CHECK(3, YAWPIN);
-  RX_PIN_CHECK(4, FMODEPIN);
-  
-  */
-    #if (PCINT_PIN_COUNT > 0) //THROTTLEPIN
+
+    #if (PCINT_PIN_COUNT > 0) //THROTTLEPIN => Throttle or PPM Signal
       #if RC_PPM_MODE == ENABLED
-        if ((mask & PCInt_RX_Pins[0]) &&  //Compute PPM, when PPM pin state change
-            (pin & PCInt_RX_Pins[0])) {   //and when PPM pin is high => both say it's rising 
+        if ((mask & PCInt_RX_Pins[THROTTLE_STD]) &&  //Compute PPM, when PPM pin state change
+            (pin & PCInt_RX_Pins[THROTTLE_STD])) {   //and when PPM pin is high => both say it's rising 
             computePPM(cTime);
         }
       #else 
-        RX_PIN_CHECK(0,2);
+        RX_PIN_CHECK(THROTTLE_STD);
       #endif
     #endif
+   
     #if (PCINT_PIN_COUNT > 1) //ROLLPIN
-      RX_PIN_CHECK(1,4);
+      RX_PIN_CHECK(GIMBALROLL_STD);
     #endif
     #if (PCINT_PIN_COUNT > 2) //PITCHPIN
-      RX_PIN_CHECK(2,5);
+      RX_PIN_CHECK(GIMBALPITCH_STD);
     #endif
-    #if (PCINT_PIN_COUNT > 3) //YAWPIN
-      RX_PIN_CHECK(3,6);
-    #endif
-    #if (PCINT_PIN_COUNT > 4) //FMODEPIN
-      RX_PIN_CHECK(4,7);
+    
+    #if !defined(RC_PPM_MODE) || RC_PPM_MODE != ENABLED
+      #if (PCINT_PIN_COUNT > 3) //YAWPIN
+        RX_PIN_CHECK(YAW_STD);
+      #endif
+      #if (PCINT_PIN_COUNT > 4) //FMODEPIN
+        RX_PIN_CHECK(FMODE_STD);
+      #endif
     #endif
 }
 
@@ -82,8 +79,10 @@ ISR(RX_PC_INTERRUPT) { //this ISR is common to every receiver channel, it is cal
 uint16_t readRawRC(uint8_t chan) {
   uint16_t data;
   uint8_t oldSREG;
-  oldSREG = SREG; cli(); // Let's disable interrupts
-  data = rcValueSTD[rcChannelSTD[chan]]; // Let's copy the data Atomically
+  oldSREG = SREG; cli(); // Copy interrupt state (don't know state) and then to be safe let's disable interrupts (maybe already disabled or not)
+
+  data = rcValueSTD[chan]; // Let's copy the data Atomically
+  
   SREG = oldSREG;        // Let's restore interrupt state
 
   return data; // We return the value correctly copied when the IRQ's where disabled
@@ -94,7 +93,6 @@ void computePPM(uint16_t now) {
     static uint16_t last = 0;
     static uint8_t chan = 0;
   
-    //sei();
     diff = now - last;
     last = now;
     if(diff>3000) {
@@ -110,16 +108,20 @@ void computePPM(uint16_t now) {
 uint16_t readPPMRawRC(uint8_t chan) {
   uint16_t data;
   uint8_t oldSREG;
-  oldSREG = SREG; cli(); // Let's disable interrupts
+  oldSREG = SREG; cli(); // Copy interrupt state (don't know state) and then to be safe let's disable interrupts (maybe already disabled or not)
+  
   data = rcValuePPM[rcChannelPPM[chan]]; // Let's copy the data Atomically
+  
   SREG = oldSREG;        // Let's restore interrupt state
-  //sei();
+
   return data; // We return the value correctly copied when the IRQ's where disabled
 }
 
 /**************************************************************************************/
 /***************          compute and Filter the RX data           ********************/
 /**************************************************************************************/
+
+//PB gimbal pitch with PPM sum
 void computeRC_STD() {
   static uint16_t rcData4Values[RC_CHANS_STD][4], rcDataMean[RC_CHANS_STD];
   static uint8_t rc4ValuesIndex = 0; //Average on 4 differents values
@@ -174,7 +176,7 @@ void analyseRC() {
         computeRC_PPM(); //Decode PPM Sum
         rcDataSTD[THROTTLE_STD] = rcDataPPM[THROTTLE_PPM];
         rcDataSTD[FMODE_STD] = rcDataPPM[FMODE_PPM];
-        rcDataSTD[YAW_STD] = rcDataPPM[YAW_PPM];;
+        rcDataSTD[YAW_STD] = rcDataPPM[YAW_PPM];
     #endif
     
     if( currtime - lastcomputetime > 30 ) { //Should be more than 27, because PPM Sum can be 27ms long
