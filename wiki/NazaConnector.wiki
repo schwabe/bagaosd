@@ -39,7 +39,7 @@ If your Naza MC and your BagaOSD are not powered from the same battery, you need
 
 
 
-After testing your don't have any shortcut between pin, and your wire is well connected, insulate the 4 contacts with whatever you want (expoxy, heatshrink, Instamorph Pellets, ...).
+After testing you don't have any shortcut between pin, and your wire is well connected, insulate the 4 contacts with whatever you want (expoxy, heatshrink, Instamorph Pellets, ...).
 I put a white mark on the top of my connector, to avoid any confusion when I plug it to the Naza MC.
 
 [http://bagaosd.googlecode.com/svn/files/naza_gps_adaptor_part3.jpg]

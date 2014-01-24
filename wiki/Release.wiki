@@ -3,7 +3,6 @@
 
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 26.01.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.0.zip BagaOSD_V2.0.zip]|| xxx Ko || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0.zip BagaOSD_V1.0.zip]|| 753 Ko || Stable ||
 
 

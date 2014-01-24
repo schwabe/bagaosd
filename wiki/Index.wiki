@@ -17,7 +17,7 @@ The arduino code is based on differents projects :
  * GPS uBlox decoding from [https://code.google.com/p/ardu-imu/ Ardu-IMU]
  * GPS Naza decoding from [http://www.rcgroups.com/forums/showthread.php?t=1995704 pawelsky]
 
-This project was inspired from FBOSD (http://firebug24k.com/index.php), a plug and play OSD version for DJI Naza. 
+This project was inspired from [http://firebug24k.com/index.php FBOSD], a plug and play OSD version for DJI Naza. 
 
 
 What information are displayed with BagaOSD ?
