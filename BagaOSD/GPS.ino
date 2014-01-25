@@ -46,9 +46,13 @@ void decode_gps_naza(void) {
         ground_speed    = NazaDecoder.getSpeed();
         numsats         = NazaDecoder.getNumSat();
         climb           = NazaDecoder.getClimbSpeed();
+        cog             = NazaDecoder.getCog() * 100.0;
         break;
       case NAZA_MESSAGE_COMPASS:
         heading         = NazaDecoder.getHeading();
+        if( gpsFix > 2 && ground_speed > 2 ) { //Because heading is not tilt compensate, move de COG when GPS Fix and copter is moving more than 7 Km/h
+            heading = cog / 100.0;
+        }
         break;
     }
   }
@@ -186,6 +190,8 @@ void parse_ubx_gps()
 		speed_3d      = (float)join_4_bytes(&UBX_buffer[16])/100.0;
 		ground_speed  = (float)join_4_bytes(&UBX_buffer[20])/100.0;
 		heading       = (float)join_4_bytes(&UBX_buffer[24])/100000.0;
+		cog           = heading * 100.0;
+		
 	}
 	if(UBX_id==0x21){ // ID NAV-TIMEUTC
 	    byte time_flags = UBX_buffer[19]; 
