@@ -53,28 +53,23 @@ void read_mavlink(){
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 {
-                    mavbeat = 1;
+                    //mavbeat = 1;
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
-                    apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
+                 //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
                  //   osd_mode = mavlink_msg_heartbeat_get_custom_mode(&msg);
                     osd_mode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg);
                     //Mode (arducoper armed/disarmed)
                     base_mode = mavlink_msg_heartbeat_get_base_mode(&msg);
-                    if(getBit(base_mode,7)) motor_armed = 1;
-                    else motor_armed = 0;
+                    //if(getBit(base_mode,7)) motor_armed = 1;
+                    //else motor_armed = 0;
+                    motor_armed = getBit(base_mode,7);
 
                     osd_nav_mode = 0;          
-                    lastMAVBeat = millis();
-                    
-                    /* 
-                     DMD : We can't send anything to Arduino, so this part is disabled
-                     Disable mavlink request, for Naza OSD
-                     
-                    if(waitingMAVBeats == 1){
-                        enable_mav_request = 1;
-                    }
-                    */
+                    //lastMAVBeat = millis();
+                    //if(waitingMAVBeats == 1){
+                    //    enable_mav_request = 1;
+                    //}
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -90,12 +85,15 @@ void read_mavlink(){
 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 {
+                    osd_gps_alt = mavlink_msg_gps_raw_int_get_alt(&msg) / 1000.0f;
                     osd_lat = mavlink_msg_gps_raw_int_get_lat(&msg) / 10000000.0f;
                     osd_lon = mavlink_msg_gps_raw_int_get_lon(&msg) / 10000000.0f;
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
-                    //gps_utc_time_second = mavlink_msg_gps_raw_int_get_time_usec(&msg);
-                    osd_eph = mavlink_msg_gps_raw_int_get_eph(&msg);
+                    osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
+
+		    //Airmamaf : Raw GPS information (GPS precision information)
+	            osd_eph = mavlink_msg_gps_raw_int_get_eph(&msg);
                 }
                 break; 
             case MAVLINK_MSG_ID_VFR_HUD:
@@ -103,9 +101,7 @@ void read_mavlink(){
                     osd_airspeed = mavlink_msg_vfr_hud_get_airspeed(&msg);
                     osd_groundspeed = mavlink_msg_vfr_hud_get_groundspeed(&msg);
                     osd_heading = mavlink_msg_vfr_hud_get_heading(&msg); // 0..360 deg, 0=north
-                    osd_throttle = mavlink_msg_vfr_hud_get_throttle(&msg);
-                    //if(osd_throttle > 100 && osd_throttle < 150) osd_throttle = 100;//Temporary fix for ArduPlane 2.28
-                    //if(osd_throttle < 0 || osd_throttle > 150) osd_throttle = 0;//Temporary fix for ArduPlane 2.28
+                    osd_throttle = (uint8_t)mavlink_msg_vfr_hud_get_throttle(&msg);
                     osd_alt = mavlink_msg_vfr_hud_get_alt(&msg);
                     osd_climb = mavlink_msg_vfr_hud_get_climb(&msg);
                 }
@@ -114,18 +110,18 @@ void read_mavlink(){
                 {
                     osd_pitch = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
                     osd_roll = ToDeg(mavlink_msg_attitude_get_roll(&msg));
-                    osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
+//                    osd_yaw = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
                 }
                 break;
             case MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT:
                 {
-                  nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
-                  nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
-                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
+//                  nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(&msg);
+//                  nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(&msg);
+//                  nav_bearing = mavlink_msg_nav_controller_output_get_nav_bearing(&msg);
                   wp_target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(&msg);
                   wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(&msg);
-                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
-                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
+//                  alt_error = mavlink_msg_nav_controller_output_get_alt_error(&msg);
+//                  aspd_error = mavlink_msg_nav_controller_output_get_aspd_error(&msg);
                   xtrack_error = mavlink_msg_nav_controller_output_get_xtrack_error(&msg);
                 }
                 break;
@@ -136,20 +132,27 @@ void read_mavlink(){
                 break;
             case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
                 {
-                    chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
-                    chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
-                    osd_chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
-                    osd_chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
-                    osd_chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
-                    osd_chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
+//                    chan1_raw = mavlink_msg_rc_channels_raw_get_chan1_raw(&msg);
+//                    chan2_raw = mavlink_msg_rc_channels_raw_get_chan2_raw(&msg);
+//                    chan3_raw = mavlink_msg_rc_channels_raw_get_chan3_raw(&msg);
+//                    chan4_raw = mavlink_msg_rc_channels_raw_get_chan4_raw(&msg);
+                    chan5_raw = mavlink_msg_rc_channels_raw_get_chan5_raw(&msg);
+                    chan6_raw = mavlink_msg_rc_channels_raw_get_chan6_raw(&msg);
+                    chan7_raw = mavlink_msg_rc_channels_raw_get_chan7_raw(&msg);
+                    chan8_raw = mavlink_msg_rc_channels_raw_get_chan8_raw(&msg);
                     osd_rssi = mavlink_msg_rc_channels_raw_get_rssi(&msg);
                 }
-                break;
+                break;           
             case MAVLINK_MSG_ID_WIND:
                 {
-                    osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
+                    osd_winddirection = abs(mavlink_msg_wind_get_direction(&msg)); // 0..360 deg, 0=north
                     osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
-                    osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
+//                    osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
+                }
+                break;
+            case MAVLINK_MSG_ID_SCALED_PRESSURE:
+                {
+                    temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
                 }
                 break;
             default:

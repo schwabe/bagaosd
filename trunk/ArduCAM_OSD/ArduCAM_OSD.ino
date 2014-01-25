@@ -3,20 +3,21 @@
 Copyright (c) 2011.  All rights reserved.
 An Open Source Arduino based OSD and Camera Control project.
 
-Program  : ArduCAM-OSD (MinimOSD [and variants] Firmware)
-Version  : V2.0, October 4th 2012
+Program  : ArduCAM-OSD (Supports the variant: minimOSD)
+Version  : V2.1, 24 September 2012
 Author(s): Sandro Benigno
 Coauthor(s):
 Jani Hirvinen   (All the EEPROM routines)
 Michael Oborne  (OSD Configutator)
-Zóltan Gábor, Pedro Santos and MinimOSD-Extra Team (Extra OSD Tools/Panels)
 Mike Smith      (BetterStream and Fast Serial libraries)
+Gábor Zoltán
+Pedro Santos
 Special Contribuitor:
 Andrew Tridgell by all the support on MAVLink
 Doug Weibel by his great orientation since the start of this project
-Contributors: James Goppert, Max Levine
+Contributors: James Goppert, Max Levine, Burt Green, Eddie Furey
 and all other members of DIY Drones Dev team
-Thanks to: Chris Anderson and Jordi Munoz
+Thanks to: Chris Anderson, Jordi Munoz
 
 
 This program is free software: you can redistribute it and/or modify
@@ -44,6 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #undef PSTR 
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
 
+#define isPAL 1
 
 /* **********************************************/
 /* ***************** INCLUDES *******************/
@@ -51,6 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 //#define membug 
 //#define FORCEINIT  // You should never use this unless you know what you are doing 
 
+//Airmamaf
 //Compiling Security 
 #ifndef __AVR_ATmega328P__
 #error Only ATmega328P board is supported
@@ -134,22 +137,30 @@ void setup()
     osd.closePanel();
 #endif
 
-    // Check EEPROM to for a new version that needs EEPROM reset
-    if(readEEPROM(CHK_VERSION) != VER) {
-        osd.setPanel(3,9);
-        osd.openPanel();
-        osd.printf_P(PSTR("EEPROM mapping outdated!|Update with the OSD Tool.")); 
-        osd.closePanel();
-        // run for ever until EEPROM version is OK 
-        for(;;) {}
-    }
+    // Just to easy up development things
+#ifdef FORCEINIT
+    InitializeOSD();
+#endif
+
+
+    // Check EEPROM to see if we have initialized it already or not
+    // also checks if we have new version that needs EEPROM reset
+//    if(readEEPROM(CHK1) + readEEPROM(CHK2) != VER) {
+//        osd.setPanel(6,9);
+//        osd.openPanel();
+//        osd.printf_P(PSTR("Missing/Old Config")); 
+//        osd.closePanel();
+        //InitializeOSD();
+//    }
 
     // Get correct panel settings from EEPROM
     readSettings();
     for(panel = 0; panel < npanels; panel++) readPanelSettings();
     panel = 0; //set panel to 0 to start in the first navigation screen
     // Show bootloader bar
-    loadBar();
+    //loadBar();
+        delay(2000);
+    Serial.flush();
 
     // Startup MAVLink timers  
     mavlinkTimer.Set(&OnMavlinkTimer, 120);
@@ -169,23 +180,22 @@ void setup()
 // As simple as possible.
 void loop() 
 {
-
-    if(enable_mav_request == 1){//Request rate control
-        osd.clear();
-        osd.setPanel(3,10);
-        osd.openPanel();
-        osd.printf_P(PSTR("Requesting DataStreams...")); 
-        osd.closePanel();
-        for(int n = 0; n < 3; n++){
-            request_mavlink_rates();//Three times to certify it will be readed
-            delay(50);
-        }
+  /*  if(enable_mav_request == 1){//Request rate control
+        //osd.clear();
+        //osd.setPanel(3,10);
+        //osd.openPanel();
+        //osd.printf_P(PSTR("Requesting DataStreams...")); 
+        //osd.closePanel();
+        //for(int n = 0; n < 3; n++){
+        //    request_mavlink_rates();//Three times to certify it will be readed
+        //    delay(50);
+        //}
         enable_mav_request = 0;
-        delay(2000);
+        //delay(2000);
         osd.clear();
         waitingMAVBeats = 0;
         lastMAVBeat = millis();//Preventing error from delay sensing
-    }
+    }*/
 
     read_mavlink();
     mavlinkTimer.Run();
@@ -197,13 +207,15 @@ void OnMavlinkTimer()
 {
     setHeadingPatern();  // generate the heading patern
 
-    //  osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
-    osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     //DMD : battery A remmaning picture 
+    //osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
+osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     //Airmamaf : battery A remmaning picture 
     //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
     setHomeVars(osd);   // calculate and set Distance from home and Direction to home
     
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
+    
+    setFdataVars();
 }
 
 
