@@ -9,7 +9,7 @@
 
 === MinimOSD Config tool ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.3.0.6_20140125 Config_tool_v2.3.0.6_20140125]|| 1.46 Mo || Stable ||
+|| 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.3.0.6_20140125.zip Config_tool_v2.3.0.6_20140125.zip]|| 1.46 Mo || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.1.2.0_20131106.zip Config_tool_v2.1.2.0_20131106.zip]|| 505 Ko || Stable ||
 
 === MinimOSD ===
