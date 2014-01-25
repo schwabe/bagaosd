@@ -7,7 +7,7 @@ The name of BagaOSD comes from [http://en.wikipedia.org/wiki/Ch%C3%A2teau_de_Bag
 Arduino hardware is used to compute sensors information and MinimOSD hardware is used to display the information computed by the Arduino. Communication between Arduino and MinimOSD is done with MavLINK 1.0
 
 
-The original project of [https://code.google.com/p/minimosd-extra MinimOSD] hardware was slighly modified for BagaOSD, but communication is the same. You can use the original project if you want, but there's no guarantee it will work a 100%
+The original project of [https://code.google.com/p/minimosd-extra MinimOSD] hardware was slighly [MinimOSD modified] for BagaOSD, but communication is the same. You can use the original project if you want, but there's no guarantee it will work a 100%
  
 
 
