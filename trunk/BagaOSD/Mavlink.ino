@@ -91,7 +91,7 @@ void sendHeartBeat() {
 
 //Send GPS data
 void sendGpsData() {
-  //mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0,gps_utc_time_second, gpsFix, (long)(lat*10000000), (long)(lon*10000000), alt_MSL, vdop,hdop, ground_speed, heading, numsats);
+  //mavlink_msg_gps_raw_int_send(MAVLINK_COMM_0,gps_utc_time_second, gpsFix, (long)(lat*10000000), (long)(lon*10000000), alt_MSL, vdop,hdop, ground_speed, cog, numsats);
   //MAVLINK_MSG_ID_GPS_RAW_INT
   mavlink_msg_gps_raw_int_send(
     MAVLINK_COMM_0,
@@ -103,7 +103,7 @@ void sendGpsData() {
     vdop,
     hdop, 
     ground_speed, 
-    heading, 
+    cog, 
     numsats);
 }
 

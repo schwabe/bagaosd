@@ -118,6 +118,7 @@ void setFdataVars(){
   //If it is stoped for more than 10 seconds, declare a landing
   else if(((millis() - not_moving_since) > 10000) && (landed_at_time == 4294967295) && (takeofftime == 1)){
     landed_at_time = millis();
+    takeofftime = 0; //Airmamaf Declare landing
   }
 
   if (osd_groundspeed > 1.0) tdistance += (osd_groundspeed * (millis() - dt) / 1000.0);

@@ -205,7 +205,7 @@ void panEff(int first_col, int first_line){
     if (takeofftime){
         ////If in loiter should estimated remaining flight time
         //if ((osd_climb > -0.05) && (osd_climb < 0.05) && (osd_groundspeed * converts < 2)){ 
-          if(osd_battery_remaining_A != last_battery_reading){
+          if(osd_battery_remaining_A != last_battery_reading && start_battery_reading != osd_battery_remaining_A ){ //Airmamaf avoid a division by 0
             remaining_Time = osd_battery_remaining_A * ((millis()/1000) - FTime) / (start_battery_reading - osd_battery_remaining_A);
             last_battery_reading = osd_battery_remaining_A;
           }
