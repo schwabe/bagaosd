@@ -46,7 +46,7 @@ void setHomeVars(OSD &osd)
   float dstlon, dstlat;
   long bearing;
   
-  osd_alt_to_home = (osd_alt - osd_home_alt);
+  //osd_alt_to_home = (osd_alt - osd_home_alt); //Airmamaf to comment, otherwise osd_alt_to_home will always be 0
   //Check arm/disarm switching.
   if (motor_armed ^ last_armed){
     //If motors armed, reset home in Arducopter version

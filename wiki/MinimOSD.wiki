@@ -10,7 +10,7 @@ Please use the minimosd-extra [http://code.google.com/p/minimosd-extra/wiki/inde
 BagaOSD come with a slighly modified version of minimosd-extra, BagaOSD use MavLINK 1.0 to comunicate with MinimOSD, so all upcoming version of minimosd-extra should be usable.
 
 
-List of things modified in the minimosd-extra version coming with BagaOSD :
+List of things modified in the minimosd-extra version coming with BagaOSD (modifications made from r627 / Copter: 2.4 stable release):
 
  * GPS HDOP horizontal (GPS quality signal) 
  * Battery picture (6 positions)

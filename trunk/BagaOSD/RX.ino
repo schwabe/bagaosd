@@ -66,8 +66,8 @@ ISR(RX_PC_INTERRUPT) { //this ISR is common to every receiver channel, it is cal
     #endif
     
     #if !defined(RC_PPM_MODE) || RC_PPM_MODE != ENABLED
-      #if (PCINT_PIN_COUNT > 3) //YAWPIN
-        RX_PIN_CHECK(YAW_STD);
+      #if (PCINT_PIN_COUNT > 3) //AUXPIN
+        RX_PIN_CHECK(AUX_STD);
       #endif
       #if (PCINT_PIN_COUNT > 4) //FMODEPIN
         RX_PIN_CHECK(FMODE_STD);
@@ -176,7 +176,7 @@ void analyseRC() {
         computeRC_PPM(); //Decode PPM Sum
         rcDataSTD[THROTTLE_STD] = rcDataPPM[THROTTLE_PPM];
         rcDataSTD[FMODE_STD] = rcDataPPM[FMODE_PPM];
-        rcDataSTD[YAW_STD] = rcDataPPM[YAW_PPM];
+        rcDataSTD[AUX_STD] = rcDataPPM[AUX4_PPM];
     #endif
     
     if( currtime - lastcomputetime > 30 ) { //Should be more than 27, because PPM Sum can be 27ms long

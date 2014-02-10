@@ -135,8 +135,8 @@ void loop(){
         Serial.print("FMODE PPM: ");
         Serial.print(rcDataSTD[FMODE_PPM]);
         Serial.print(";");
-        Serial.print("YAW : ");
-        Serial.print(rcDataSTD[YAW_STD]);
+        Serial.print("AUX CMD : ");
+        Serial.print(rcDataSTD[AUX_STD]);
         Serial.println("");
         Serial.print("Voltage : ");
         Serial.print(long(VFinal*1000.0));

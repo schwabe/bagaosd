@@ -47,7 +47,7 @@ Standard receiver configuration
 Pin 2           :   Throttle
 Pin 4           :   Gimbal roll for horizon display
 Pin 5           :   Gimbal pitch for horizon display
-Pin 6           :   Yaw (not used)
+Pin 6           :   AUX (for pannel switch in MinimOSD)
 Pin 7           :   FMode (Flight mode : Acro / Atti / Gps / Failsafe) - Flight Mode
 
 
