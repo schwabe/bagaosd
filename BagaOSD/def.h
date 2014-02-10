@@ -4,7 +4,7 @@
 #define PCINT_PIN_COUNT            5
 //PORTD : bit 0 and 1 is for TX/RX, shouldn't modify
 #define PCINT_RX_BITS              (1<<2),(1<<4),(1<<5),(1<<6),(1<<7) //Activate pin 2 / 4 / 5 / 6 / 7
-#define RX_PIN_ORDER               THROTTLEPIN, GIMBALROLLPIN, GIMBALPITCHPIN, YAWPIN, FMODEPIN
+#define RX_PIN_ORDER               THROTTLEPIN, GIMBALROLLPIN, GIMBALPITCHPIN, AUXPIN, FMODEPIN
 #define PCINT_RX_PORT              PORTD  //D Port (num. pin from 0 to 7) : Value 0 => Input / Value 1 => Output
 #define PCINT_RX_MASK              PCMSK2 //Enable watch for pin value change
 #define PCIR_PORT_BIT              (1<<2) //PCICR |= (1<<PCIE#), PCIE # is 2 for PORTD (D0-D7), this value enbale interrupt PCMSK2
@@ -19,7 +19,7 @@
 #define THROTTLEPIN                2 //For PPM Sum, this pin is used for all channels
 #define GIMBALROLLPIN              4
 #define GIMBALPITCHPIN             5
-#define YAWPIN                     6
+#define AUXPIN                     6
 #define FMODEPIN                   7 //Naza mode
 
 #define ENABLED                    1
@@ -32,7 +32,7 @@ enum STD_ORDERED_CHANNEL_COMPUTE {
   THROTTLE_STD,
   GIMBALROLL_STD, 
   GIMBALPITCH_STD, 
-  YAW_STD, 
+  AUX_STD, 
   FMODE_STD
 };
 
