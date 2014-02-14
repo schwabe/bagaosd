@@ -1,19 +1,9 @@
-float pitchgain=12.0;
-float rollgain=7.6;
-
-bool invertpitch=false;
-bool invertroll=false;
-
 //Flight mode
 int flightmode=5;               //2=Alt Hold(Attitude), 1=Acrobatic, 6=Return to launch(Failsafe), 5=Loiter(GPS Attitude);
 
 //Gimbal position 
-float pitch_rad=10;
-float roll_rad=10;
-long levelpitch=0;
-long levelroll=0;
-long pitch=1500;
-long roll=1500;
+float pitch_rad=0;
+float roll_rad=0;
 
 float capacity=0;
 float mahout=0;
@@ -27,15 +17,15 @@ int throttlepercent=0;
 int gpsFix=1;
 float lat=0;
 float lon=0;
-float alt_MSL=0;
+float alt_MSL_m=0;
 long iTOW=0;
-float alt=0;
-short hdop=9999;
-short vdop=9999;
+float alt_m=0;
+short hdop_cm=65535;
+short vdop_cm=65535;
 float speed_3d=0;
-float ground_speed=0;
-float heading=90.0;
-float cog=heading * 100.0;
+float ground_speed_ms=0;
+float heading_d=90.0;
+float cog_cd=heading_d * 100.0;
 float climb=0;
 char data_update_event=0;
 short time_year=0;

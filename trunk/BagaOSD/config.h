@@ -36,10 +36,20 @@
 
 //GPS Handler
 #define DECODE_NAZA_GPS            TRUE  //TRUE : Decode Naza GPS Protocol - FALSE : Solder a wire and decode RAW uBlox Message
+#define NAZA_COMPASS_TILT_COMP     TRUE  //TRUE : Tilt compensate compass information from Naza GPS, FALSE no tilt compensation, use COG instead of heading 
 
 //Throttle
 #define THROTTLE_PWM_MIN           1000
 #define THROTTLE_PWM_MAX           2000
+
+//Artificial horizon
+#define PITCH_GAIN                 7.6 //12 for Naza
+#define PITCH_LEVEL                1500
+#define PITCH_INVERT               FALSE
+
+#define ROLL_GAIN                  7.6 //7.6 for Naza
+#define ROLL_LEVEL                 1500
+#define ROLL_INVERT                FALSE
 
 
 /**

@@ -3,6 +3,7 @@
 
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
+|| 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.0.zip BagaOSD_V2.0.zip]|| 703 Ko || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0.zip BagaOSD_V1.0.zip]|| 753 Ko || Stable ||
 
@@ -16,3 +17,22 @@
 || *Date* || *File* || *Size* || *Label* ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.4.zip MinimOSD_V2.4.zip]|| 719 Ko || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.0.zip MinimOSD_V2.0.zip]|| 766 Ko || Stable ||
+
+
+=== Release Notes ===
+14.02.2014 - v2.1 (beta)
+ * Ability to switch pannel in MinimOSD (ch8)
+ * No more calibration for artificial horizon 
+ * Altitude bug corrected in MAVLINK_MSG_ID_GPS_RAW_INT message
+ * Add parameter for Naza gimbal output
+ * Add parameter to tilt compensate Naza compass heading
+
+25.01.2014 - v2.0 ([http://code.google.com/p/bagaosd/source/detail?r=8 r8]):
+ * Change pin mapping (Pin 8 instead of TX) to output mavlink data to MinimOSD
+ * Naza GPS Decoding information done with [http://www.rcgroups.com/forums/showthread.php?t=1995704 NazaDecoderLib] (thanks to pawelsky)
+ * Add RSSIFilter to smooth RSSI PWM
+ 
+06.11.2013 - v1.0 ([http://code.google.com/p/bagaosd/source/detail?r=1 r1]):
+ * Initial release
+ 
+ 

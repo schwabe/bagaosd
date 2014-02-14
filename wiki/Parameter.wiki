@@ -38,7 +38,9 @@ Internal buffer to smooth PWM RSSI signal. Only used if *RSSI_USE_PWM* is ENABLE
 }}}
 
 ==== Analog Rssi ====
-Set the analog PIN (default A2) you want to use to read RSSI analog source. This part is ignored if *RSSI_USE_PWM* is *ENABLED*. If you don't need to display RSSI, assign -1 value (*#define RSSI_PIN_ANALOG -1*)
+Set the analog PIN (default A2) you want to use to read RSSI analog source. 
+
+This part is ignored if *RSSI_USE_PWM* is *ENABLED*. If you don't need to display RSSI, assign -1 value (*#define RSSI_PIN_ANALOG -1*)
 
 {{{
 #define RSSI_PIN_ANALOG            A2
@@ -57,10 +59,13 @@ Set it to ENABLED if your receiver output PPM (get all the channels information 
 
 Set the channel order if you're using a PPM receiver and *RC_PPM_MODE* is *ENABLED*. 
 
-Only 2 channels are used : *THROTTLE_PPM* (for flight time and throttle percent) and *FMODE_PPM* (for flight mode)
+Only 2 channels are used : *THROTTLE_PPM* (for flight time and throttle percent) and *FMODE_PPM* (for flight mode). But all the channels (THROTTLE / YAW / X1 / X2 / FMODE / AUX4) are transmitted to MinimOSD
+
+
+So you can use AUX channel to switch pannel inside MinimOSD (choose ch8)
 
 {{{
-#define SERIAL_SUM_PPM             ROLL_PPM,PITCH_PPM,THROTTLE_PPM,YAW_PPM,X1_PPM,X2_PPM,FMODE_PPM,...
+#define SERIAL_SUM_PPM             ROLL_PPM,PITCH_PPM,THROTTLE_PPM,YAW_PPM,X1_PPM,X2_PPM,FMODE_PPM,AUX4_PPM,...
 }}}
 
 
@@ -143,12 +148,22 @@ LIPO capacity in mah to dispaly remaining percent of battery (when a current sen
 ----
 === GPS Handler ===
 Choose what method to use to get Naza GPS data, TRUE for [NazaConnector Naza decoding], FALSE for uBlow [uBloxSolder raw decoding]
+
+TRUE : Decode Naza GPS Protocol (connector choice)
+
+FALSE : Decode RAW uBlox Message (GPS solder choice)
 {{{
 #define DECODE_NAZA_GPS            TRUE  
-//TRUE : Decode Naza GPS Protocol (connector choice)
-//FALSE : Decode RAW uBlox Message (solder choice)
 }}}
 
+When using Naza GPS Protocol, Heading (direct compass information) should be tilt compensate, this could be done when Naza Gimbal output is connected to BagaOSD. 
+
+Naza Gimbal output is not really accurate, so compass tilt compensation could lead to wrong values. 
+
+If you don't want real heading (NAZA_COMPASS_TILT_COMP set to FALSE), COG will be used instead of heading.
+{{{
+#define NAZA_COMPASS_TILT_COMP     FALSE
+}}}
 
 ----
 === Throttle limit ===
@@ -158,6 +173,33 @@ Those parameters are used to compute throttle percent. Put the min. and max. sig
 #define THROTTLE_PWM_MAX           2000
 }}}
 
+----
+=== Artificial horizon ===
+The following paramters are used to adjust display of artificial horizon.
 
+INVERT is used to invert the artificial horizon.
+{{{
+#define PITCH_GAIN                 7.6 
+#define PITCH_LEVEL                1500
+#define PITCH_INVERT               FALSE
 
+#define ROLL_GAIN                  7.6 
+#define ROLL_LEVEL                 1500
+#define ROLL_INVERT                FALSE
+}}}
 
+The following paramters were set in Naza for Gimbal output
+
+*Servo travel limit*
+||*Output*||*Max*||*Center*||*Min*||
+||Pitch (F2)||1000||-40||-1000||
+||Roll (F1)||1000||-30||-1000||
+
+*Automatic Gain control*
+||*Output*||*Gain*||*Direction*||
+||Pitch||12||Normal||
+||Roll||7.6||Normal||
+
+*Manual Control Speed*
+||*Output*||*Gain*||
+||Pitch (X1)||0||

@@ -1,3 +1,5 @@
+#define ToDeg(x) ( x * RAD_TO_DEG)	
+
 // RX parameter
 #define RC_CHANS_STD               5
 #define RC_CHANS_PPM               12

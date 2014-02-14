@@ -27,7 +27,7 @@ _*Break Away Male Headers - Right Angle*_
  * [https://www.sparkfun.com/products/553]
 
 
----- 
+----
 == MinimOSD part == 
 
 _*Minim OSD v1.1*_
