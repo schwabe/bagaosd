@@ -66,6 +66,11 @@ uint8_t NazaDecoderLib::getHour() { return gpsData.hour; }
 uint8_t NazaDecoderLib::getMinute() { return gpsData.minute; }
 uint8_t NazaDecoderLib::getSecond() { return gpsData.second; }
 
+void NazaDecoderLib::setCompensation(double pitch, double roll) { //Airmamaf tilt compensation
+    rad_pitch_cmp = pitch;
+    rad_roll_cmp = roll; 
+}
+
 uint8_t NazaDecoderLib::decode(int input)
 { 
   if((seq == 0) && (input == 0x55)) { seq++; }                                                             // header (part 1 - 0x55)
@@ -122,11 +127,25 @@ uint8_t NazaDecoderLib::decode(int input)
       mask = (((mask ^ (mask >> 4)) & 0x0F) | ((mask << 3) & 0xF0)) ^ (((mask & 0x01) << 3) | ((mask & 0x01) << 7)); 
       int16_t x = decodeShort(0, mask);
       int16_t y = decodeShort(2, mask);
+      int16_t z = decodeShort(4, mask); //Airmamaf for tilt compensation
+      /*
       if(x > magXMax) magXMax = x;
       if(x < magXMin) magXMin = x;
       if(y > magYMax) magYMax = y;
       if(y < magYMin) magYMin = y;
-      gpsData.heading = atan2(y - ((magYMax + magYMin) / 2), x - ((magXMax + magXMin) / 2)) * 180.0 / M_PI;
+      */
+      
+      //Airmamaf Tilt compensation
+      double comp_x = x*cos(rad_pitch_cmp) + z*sin(rad_pitch_cmp);
+      double comp_y = x*sin(rad_roll_cmp)*sin(rad_pitch_cmp) + y*cos(rad_roll_cmp) - z*sin(rad_roll_cmp)*cos(rad_pitch_cmp);
+      /*if(comp_x > magXMax) magXMax = comp_x;
+      if(comp_x < magXMin) magXMin = comp_x;
+      if(comp_y > magYMax) magYMax = comp_y;
+      if(comp_y < magYMin) magYMin = comp_y;*/
+      
+      gpsData.heading = atan2(comp_y, comp_x) * 180.0 / M_PI;
+      //gpsData.heading = atan2(y - ((magYMax + magYMin) / 2), x - ((magXMax + magXMin) / 2)) * 180.0 / M_PI;
+
       if(gpsData.heading < 0) gpsData.heading += 360.0; 
     }
     return msgId;

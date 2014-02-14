@@ -21,7 +21,6 @@
 
 
 //D8-D13 OK not used by PCINT2_vect, D0-D7 KO, used by PCINT2_vect (RX.ino) and Serial
-//BagaSoftwareSerial gps(8, 9); //Read only GPS Data (no TX) : Use RX pin (8) to read, free pin for TX (9) not used
 SendOnlySoftwareSerial minimosd(8);
 
 #define MAVLINK_USE_CONVENIENCE_FUNCTIONS
@@ -103,10 +102,10 @@ void loop(){
       	last_sent_current_time_gps=currtime_gps;
         Serial.print("Lat: "); Serial.print(lat, 7);
         Serial.print(", Lon: "); Serial.print(lon, 7);
-        Serial.print(", Alt: "); Serial.print(alt, 7);
+        Serial.print(", Alt: "); Serial.print(alt_m, 7);
         Serial.print(", Fix: "); Serial.print(gpsFix);
         Serial.print(", Sat: "); Serial.println(numsats);
-        Serial.print("Heading: "); Serial.println(heading, 2);
+        Serial.print("Heading: "); Serial.println(heading_d, 2);
     }
     #endif
     #if defined(DEBUG_LOOP)
@@ -115,29 +114,55 @@ void loop(){
 
     if(currtime - last_sent_current_time > 500){
       	last_sent_current_time=currtime;
-        Serial.print("GIMBALROLL : ");
-        Serial.print(rcDataSTD[GIMBALROLL_STD]);
-        Serial.print(";");
-        Serial.print("GIMBALPITCH : ");
-        Serial.print(rcDataSTD[GIMBALPITCH_STD]);
-       Serial.print(";");
-        #if defined(RSSI_USE_PWM ) 
-          Serial.print("PITCH PPM : ");
-          Serial.print(rcDataPPM[PITCH_PPM]);
-          Serial.print(";");
-        #endif
-        Serial.print("THROTTLE : ");
-        Serial.print(rcDataPPM[THROTTLE_STD]);
+      	#if RC_PPM_MODE == ENABLED 
+      	    Serial.print("PPM;");
+      	    Serial.print("THROTTLE : ");
+            Serial.print(rcDataPPM[THROTTLE_PPM]);
+            Serial.print(";");
+            Serial.print("FMODE : ");
+            Serial.print(rcDataPPM[FMODE_PPM]);
+            Serial.print(";");
+            Serial.print("X1_PPM : ");
+            Serial.print(rcDataPPM[X1_PPM]);
+            Serial.print(";");
+            Serial.print("X2_PPM : ");
+            Serial.print(rcDataPPM[X2_PPM]);
+            Serial.print(";");
+            Serial.print("AUX4_PPM : ");
+            Serial.print(rcDataPPM[AUX4_PPM]);
+            Serial.print(";");
+        #else
+            Serial.print("STD;");
+            Serial.print("AUX CMD : ");
+            Serial.print(rcDataSTD[AUX_STD]);
+            Serial.print(";");
+      	#endif
+      	
+      	//When PPM is used, THROTTLE / FMODE values are mapped to STD
+      	Serial.print("COM;");
+  	Serial.print("THROTTLE : ");
+        Serial.print(rcDataSTD[THROTTLE_STD]);
         Serial.print(";");
         Serial.print("FMODE : ");
         Serial.print(rcDataSTD[FMODE_STD]);
         Serial.print(";");
-        Serial.print("FMODE PPM: ");
-        Serial.print(rcDataSTD[FMODE_PPM]);
+        
+      	
+      	
+      	//Common values
+        Serial.print("GIMBALROLL : ");
+        Serial.print(rcDataSTD[GIMBALROLL_STD]);
+        Serial.print(":");
+        Serial.print((long)ToDeg(roll_rad));
+        Serial.print(":");
         Serial.print(";");
-        Serial.print("AUX CMD : ");
-        Serial.print(rcDataSTD[AUX_STD]);
+        Serial.print("GIMBALPITCH : ");
+        Serial.print(rcDataSTD[GIMBALPITCH_STD]);
+        Serial.print(":");
+        Serial.print((long)ToDeg(pitch_rad));
+        Serial.print(":");
         Serial.println("");
+        
         Serial.print("Voltage : ");
         Serial.print(long(VFinal*1000.0));
         Serial.print(";");

@@ -39,20 +39,26 @@ void decode_gps_naza(void) {
         gpsFix          = NazaDecoder.getFixType();
         lon             = NazaDecoder.getLon();
 	lat             = NazaDecoder.getLat();
-        alt             = NazaDecoder.getAlt();
-        alt_MSL         = alt; //This information is not set in NazaDecoder lib, so we use alt instead
-        vdop            = NazaDecoder.getVdop();
-        hdop            = NazaDecoder.getHdop();
-        ground_speed    = NazaDecoder.getSpeed();
+        alt_m           = NazaDecoder.getAlt();
+        alt_MSL_m       = alt_m; //This information is not set in NazaDecoder lib, so we use alt instead
+        vdop_cm         = NazaDecoder.getVdop() * 100;
+        hdop_cm         = NazaDecoder.getHdop() * 100;
+        ground_speed_ms = NazaDecoder.getSpeed();
         numsats         = NazaDecoder.getNumSat();
         climb           = NazaDecoder.getClimbSpeed();
-        cog             = NazaDecoder.getCog() * 100.0;
+        cog_cd          = NazaDecoder.getCog() * 100.0;
         break;
       case NAZA_MESSAGE_COMPASS:
-        heading         = NazaDecoder.getHeading();
-        if( gpsFix > 2 && ground_speed > 2 ) { //Because heading is not tilt compensate, move de COG when GPS Fix and copter is moving more than 7 Km/h
-            heading = cog / 100.0;
-        }
+        #if NAZA_COMPASS_TILT_COMP == TRUE
+          NazaDecoder.setCompensation(pitch_rad, roll_rad); 
+          heading_d     = NazaDecoder.getHeading();
+        #else
+          heading_d     = cog_cd / 100.0;
+        #endif
+        
+        /*if( gpsFix > 2 && ground_speed_ms > 2 ) { //Because heading is not tilt compensate, use COG for Heading when GPS Fix and copter is moving more than 7 Km/h
+            heading_d = cog_cd / 100.0;
+        }*/
         break;
     }
   }
@@ -144,10 +150,10 @@ void parse_ubx_gps()
 	if(UBX_id==0x02){ //ID NAV-POSLLH
 		lon     = (float)join_4_bytes(&UBX_buffer[4])/10000000.0;
 		lat     = (float)join_4_bytes(&UBX_buffer[8])/10000000.0;
-        alt     = (float)join_4_bytes(&UBX_buffer[12])/1000.0;
+        alt_m     = (float)join_4_bytes(&UBX_buffer[12])/1000.0;
         //float  current_alt = (float)join_4_bytes(&UBX_buffer[16])/1000.0;
         //alt_MSL = current_alt;
-        alt_MSL = (float)join_4_bytes(&UBX_buffer[16])/1000.0;
+        alt_MSL_m = (float)join_4_bytes(&UBX_buffer[16])/1000.0;
 		
 		/*if(height_above_takeoff){
 			alt     = alt - origin_alt;
@@ -167,7 +173,7 @@ void parse_ubx_gps()
     		    if(origin_lat==0){
     		        origin_lat=lat;
     			origin_lon=lon;
-    			origin_alt=alt_MSL;
+    			origin_alt=alt_MSL_m;
     		    }
     		}
              }
@@ -182,15 +188,15 @@ void parse_ubx_gps()
 		numsats=UBX_buffer[47];
 	}
 	if (UBX_id==0x04) { //DOP
-		hdop=(short)join_2_bytes(&UBX_buffer[12]);  //in CM?
-		vdop=(short)join_2_bytes(&UBX_buffer[10]);  //in CM?
+		hdop_cm=(short)join_2_bytes(&UBX_buffer[12]);  //in CM?
+		vdop_cm=(short)join_2_bytes(&UBX_buffer[10]);  //in CM?
 	}
 	if(UBX_id==0x12){ // ID NAV-VELNED
-	    climb         = (float)join_4_bytes(&UBX_buffer[12])/100.0; 
-		speed_3d      = (float)join_4_bytes(&UBX_buffer[16])/100.0;
-		ground_speed  = (float)join_4_bytes(&UBX_buffer[20])/100.0;
-		heading       = (float)join_4_bytes(&UBX_buffer[24])/100000.0;
-		cog           = heading * 100.0;
+	        climb           = (float)join_4_bytes(&UBX_buffer[12])/100.0; 
+		speed_3d        = (float)join_4_bytes(&UBX_buffer[16])/100.0;
+		ground_speed_ms = (float)join_4_bytes(&UBX_buffer[20])/100.0;
+		heading_d       = (float)join_4_bytes(&UBX_buffer[24])/100000.0;
+		cog_cd          = heading_d * 100.0;
 		
 	}
 	if(UBX_id==0x21){ // ID NAV-TIMEUTC

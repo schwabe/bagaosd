@@ -121,7 +121,6 @@ uint16_t readPPMRawRC(uint8_t chan) {
 /***************          compute and Filter the RX data           ********************/
 /**************************************************************************************/
 
-//PB gimbal pitch with PPM sum
 void computeRC_STD() {
   static uint16_t rcData4Values[RC_CHANS_STD][4], rcDataMean[RC_CHANS_STD];
   static uint8_t rc4ValuesIndex = 0; //Average on 4 differents values
@@ -136,14 +135,6 @@ void computeRC_STD() {
     rcDataMean[chan]= (rcDataMean[chan]+2)>>2; //Divide by 4 to get an average, add 2 to round value (eg 0.5 and above is 1, 0.4 and low is 0)
     if ( rcDataMean[chan] < (uint16_t)rcDataSTD[chan] -3)  rcDataSTD[chan] = rcDataMean[chan]+2;
     if ( rcDataMean[chan] > (uint16_t)rcDataSTD[chan] +3)  rcDataSTD[chan] = rcDataMean[chan]-2;
-  }
-  
-  roll = rcDataSTD[GIMBALROLL_STD];
-  pitch = rcDataSTD[GIMBALPITCH_STD];
-  long now=millis();
-  if(now<10000){      //use for smoothing
-    levelpitch=pitch;
-    levelroll=roll;
   }
 }
 
@@ -163,8 +154,6 @@ void computeRC_PPM() {
     if ( rcDataMeanPPM[chan] < (uint16_t)rcDataPPM[chan] -3)  rcDataPPM[chan] = rcDataMeanPPM[chan]+2;
     if ( rcDataMeanPPM[chan] > (uint16_t)rcDataPPM[chan] +3)  rcDataPPM[chan] = rcDataMeanPPM[chan]-2;
   }
-  
-  
 }
 
 
@@ -176,7 +165,6 @@ void analyseRC() {
         computeRC_PPM(); //Decode PPM Sum
         rcDataSTD[THROTTLE_STD] = rcDataPPM[THROTTLE_PPM];
         rcDataSTD[FMODE_STD] = rcDataPPM[FMODE_PPM];
-        rcDataSTD[AUX_STD] = rcDataPPM[AUX4_PPM];
     #endif
     
     if( currtime - lastcomputetime > 30 ) { //Should be more than 27, because PPM Sum can be 27ms long

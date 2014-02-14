@@ -51,6 +51,7 @@ class NazaDecoderLib
     uint8_t getHour();
     uint8_t getMinute();
     uint8_t getSecond();
+    void setCompensation(double,double); //Airmamaf tilt compensation
 
   private:
     int gpsPayload[58];
@@ -64,6 +65,8 @@ class NazaDecoderLib
     int16_t magXMax;
     int16_t magYMin;
     int16_t magYMax;
+    double rad_pitch_cmp; // Airmamaf add rad_pitch for heading tilt compensation
+    double rad_roll_cmp; // Airmamaf add rad_roll for heading tilt compensation
 
     typedef struct
     {
