@@ -21,6 +21,12 @@ List of things modified in the minimosd-extra version coming with BagaOSD (modif
 
 To display RSSI Signal bar, you should uncheck "RSSI Enable Raw" in the config panel of minimosd-extra config tool.
 
+== OSD Toggle Channel ==
+To use "OSD Toggle Channel" function of MinimOSD :
+ * With a Standard receiver, choose "Ch 8" for "OSD Toggle Channel" and solder the receiver wire to Pin6 of Arduino.
+ * With a PPM receiver, choose the correct channel in "OSD Toggle Channel" corresponding to your receiver channel.
+
+
 == Informations send to MinimOSD ==
 Several MavLINK message are sent to MinimOSD, at the following [https://code.google.com/p/minimosd-extra/wiki/APM rate] :
 
