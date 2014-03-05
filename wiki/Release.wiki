@@ -1,6 +1,10 @@
 #sidebar Menu
 #summary Release of BagaOSD
 
+For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] please change the following parameter
+{{{
+#define NAZA_COMPASS_TILT_COMP     FALSE
+}}}
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
 || 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||

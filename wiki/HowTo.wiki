@@ -49,7 +49,7 @@ All the [Parameter configuration] is done in a single file "config.h". Of course
 || 2 || Throttle || 
 || 4 || Gimbal roll for horizon display || 
 || 5 || Gimbal pitch for horizon display || 
-|| 6 || Yaw (not used) || 
+|| 6 || MinimOSD Panel Switch || 
 || 7 || FMode (Flight mode : Acro / Atti / Gps / Failsafe) - Flight Mode ||
 
 === Arduino with standard receiver ===
