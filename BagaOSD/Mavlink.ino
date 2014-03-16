@@ -88,11 +88,19 @@ void sendHeartBeat() {
   //flightmode 8 : Position
   //flightmode 9 : Land
   //flightmode 10 : OF_Loiter
+  
+  uint8_t mav_base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED | MAV_MODE_FLAG_GUIDED_ENABLED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED | MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
+  
+  //Consider copter armed when there's some throttle
+  if( throttlepercent > 10 ) {
+    mav_base_mode = mav_base_mode | MAV_MODE_FLAG_SAFETY_ARMED;
+  }
+  
   mavlink_msg_heartbeat_send(
     MAVLINK_COMM_0, 
     MAV_TYPE_QUADROTOR, 
     MAV_AUTOPILOT_GENERIC, 
-    MAV_MODE_FLAG_STABILIZE_ENABLED | MAV_MODE_FLAG_GUIDED_ENABLED | MAV_MODE_FLAG_SAFETY_ARMED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED | MAV_MODE_FLAG_MANUAL_INPUT_ENABLED, 
+    mav_base_mode, 
     flightmode, 
     MAV_STATE_STANDBY);
 }
@@ -144,13 +152,13 @@ void sendGpsData() {
 // yawspeed Yaw angular speed (rad/s)
 
 void sendAttitude() {
-	pitch_rad = (rcDataSTD[GIMBALPITCH_STD] - PITCH_LEVEL) * PI/500.0 * PITCH_GAIN/12.00;      //500 is the difference between vertical and level
+	pitch_rad = (rcDataSTD[GIMBALPITCH_STD] - PITCH_LEVEL) * PI/500.0 * PITCH_GAIN / 10.0; ///12.00;      //500 is the difference between vertical and level
 	if(PITCH_INVERT == TRUE) pitch_rad = pitch_rad * -1.0;
 	//need to scale up or down the pitch and roll - a delta of 500 is correct if pitch = 12 and roll is 7.6.  So scale the inputted values by that?
 	//Pitch correction factor = configured pitch gain /12.00
 	//Roll correction factor = configured roll gain / 7.60
 
-	roll_rad = (rcDataSTD[GIMBALROLL_STD] - ROLL_LEVEL) * PI/500.0 * ROLL_GAIN/7.60;
+	roll_rad = (rcDataSTD[GIMBALROLL_STD] - ROLL_LEVEL) * PI/500.0 * ROLL_GAIN / 10.0; ///7.60;
 	if(ROLL_INVERT == TRUE) roll_rad = roll_rad * -1.0;
 
 	if(pitch_rad<0.05 && pitch_rad>-0.05) pitch_rad=0;

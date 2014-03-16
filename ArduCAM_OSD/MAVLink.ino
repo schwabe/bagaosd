@@ -48,12 +48,13 @@ void read_mavlink(){
 
         //trying to grab msg  
         if(mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &status)) {
+            lastMAVBeat = millis();
             mavlink_active = 1;
             //handle msg
             switch(msg.msgid) {
             case MAVLINK_MSG_ID_HEARTBEAT:
                 {
-                    //mavbeat = 1;
+                    mavbeat = 1;
                     apm_mav_system    = msg.sysid;
                     apm_mav_component = msg.compid;
                  //   apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
@@ -66,10 +67,10 @@ void read_mavlink(){
                     motor_armed = getBit(base_mode,7);
 
                     osd_nav_mode = 0;          
-                    //lastMAVBeat = millis();
-                    //if(waitingMAVBeats == 1){
-                    //    enable_mav_request = 1;
-                    //}
+                    /*lastMAVBeat = millis();
+                    if(waitingMAVBeats == 1){
+                        enable_mav_request = 1;
+                    }*/
                 }
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
@@ -91,9 +92,7 @@ void read_mavlink(){
                     osd_fix_type = mavlink_msg_gps_raw_int_get_fix_type(&msg);
                     osd_satellites_visible = mavlink_msg_gps_raw_int_get_satellites_visible(&msg);
                     osd_cog = mavlink_msg_gps_raw_int_get_cog(&msg);
-
-		    //Airmamaf : Raw GPS information (GPS precision information)
-	            osd_eph = mavlink_msg_gps_raw_int_get_eph(&msg);
+                    eph = mavlink_msg_gps_raw_int_get_eph(&msg);
                 }
                 break; 
             case MAVLINK_MSG_ID_VFR_HUD:
@@ -145,7 +144,7 @@ void read_mavlink(){
                 break;           
             case MAVLINK_MSG_ID_WIND:
                 {
-                    osd_winddirection = abs(mavlink_msg_wind_get_direction(&msg)); // 0..360 deg, 0=north
+                    osd_winddirection = mavlink_msg_wind_get_direction(&msg); // 0..360 deg, 0=north
                     osd_windspeed = mavlink_msg_wind_get_speed(&msg); //m/s
 //                    osd_windspeedz = mavlink_msg_wind_get_speed_z(&msg); //m/s
                 }
@@ -155,6 +154,11 @@ void read_mavlink(){
                     temperature = mavlink_msg_scaled_pressure_get_temperature(&msg);
                 }
                 break;
+            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT: 
+                { 
+                    osd_home_alt = osd_alt - (mavlink_msg_global_position_int_get_relative_alt(&msg)*0.001); 
+                }
+                break; 
             default:
                 //Do nothing
                 break;

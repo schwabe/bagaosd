@@ -22,7 +22,7 @@
 
 //Voltage sensor
 #define VOLTAGE_PIN                A0    //Voltage sensor pin
-#define VOLTAGE_FACTOR             12.21 //Rise this value to lower voltage output value   
+#define VOLTAGE_FACTOR             12.35 //Rise this value to lower voltage output value   
 #define VOLTAGE_BUFFER             128   //Internal buffer to smooth voltage value
 
 //Current sensor
@@ -36,18 +36,18 @@
 
 //GPS Handler
 #define DECODE_NAZA_GPS            TRUE  //TRUE : Decode Naza GPS Protocol - FALSE : Solder a wire and decode RAW uBlox Message
-#define NAZA_COMPASS_TILT_COMP     TRUE  //TRUE : Tilt compensate compass information from Naza GPS, FALSE no tilt compensation, use COG instead of heading 
+#define NAZA_COMPASS_TILT_COMP     FALSE  //TRUE : Experimental Tilt compensate compass information from Naza GPS, FALSE no tilt compensation, use COG instead of heading 
 
 //Throttle
 #define THROTTLE_PWM_MIN           1000
 #define THROTTLE_PWM_MAX           2000
 
 //Artificial horizon
-#define PITCH_GAIN                 7.6 //12 for Naza
+#define PITCH_GAIN                 4.3 //Set Pitch Naza gain to 20 in Naza GUI
 #define PITCH_LEVEL                1500
 #define PITCH_INVERT               FALSE
 
-#define ROLL_GAIN                  7.6 //7.6 for Naza
+#define ROLL_GAIN                  4.3 //Set Roll Naza gain to 20 in Naza GUI
 #define ROLL_LEVEL                 1500
 #define ROLL_INVERT                FALSE
 

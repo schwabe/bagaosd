@@ -73,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 #include "wiring.h"
 #endif
 #include <EEPROM.h>
-#include <SimpleTimer.h>
+//#include <SimpleTimer.h>
 #include <GCS_MAVLink.h>
 
 #ifdef membug
@@ -100,7 +100,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>
 FastSerialPort0(Serial);
 OSD osd; //OSD object 
 
-SimpleTimer  mavlinkTimer;
+//SimpleTimer  mavlinkTimer;
 
 
 /* **********************************************/
@@ -158,16 +158,15 @@ void setup()
     for(panel = 0; panel < npanels; panel++) readPanelSettings();
     panel = 0; //set panel to 0 to start in the first navigation screen
     // Show bootloader bar
-    //loadBar();
-        delay(2000);
-    Serial.flush();
-
+//    loadBar();
+delay(2000);
+Serial.flush(); 
     // Startup MAVLink timers  
-    mavlinkTimer.Set(&OnMavlinkTimer, 120);
+    //mavlinkTimer.Set(&OnMavlinkTimer, 120);
 
     // House cleaning, clear display and enable timers
-    osd.clear();
-    mavlinkTimer.Enable();
+    //osd.clear();
+    //mavlinkTimer.Enable();
 
 } // END of setup();
 
@@ -180,7 +179,8 @@ void setup()
 // As simple as possible.
 void loop() 
 {
-  /*  if(enable_mav_request == 1){//Request rate control
+
+    /*if(enable_mav_request == 1){//Request rate control
         //osd.clear();
         //osd.setPanel(3,10);
         //osd.openPanel();
@@ -197,8 +197,13 @@ void loop()
         lastMAVBeat = millis();//Preventing error from delay sensing
     }*/
 
+    //Run "timer" every 120 miliseconds
+    if(millis() > mavLinkTimer + 120){
+      mavLinkTimer = millis();
+      OnMavlinkTimer();
+    }
     read_mavlink();
-    mavlinkTimer.Run();
+    //mavlinkTimer.Run();
 }
 
 /* *********************************************** */
@@ -207,7 +212,7 @@ void OnMavlinkTimer()
 {
     setHeadingPatern();  // generate the heading patern
 
-    //osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
+    //  osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     // battery A remmaning picture
 osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     //Airmamaf : battery A remmaning picture 
     //osd_battery_pic_B = setBatteryPic(osd_battery_remaining_B);     // battery B remmaning picture
 
@@ -216,8 +221,9 @@ osd_battery_pic_A = setBatteryPic(osd_battery_remaining_A);     //Airmamaf : bat
     writePanels();       // writing enabled panels (check OSD_Panels Tab)
     
     setFdataVars();
+    
+    checkModellType();
 }
-
 
 void unplugSlaves(){
     //Unplug list of SPI
