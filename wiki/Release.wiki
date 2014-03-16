@@ -7,6 +7,7 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 }}}
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
+|| 16.03.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.2.zip BagaOSD_V2.2.zip]|| 722 Ko || Stable ||
 || 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.0.zip BagaOSD_V2.0.zip]|| 703 Ko || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0.zip BagaOSD_V1.0.zip]|| 753 Ko || Stable ||
@@ -14,16 +15,26 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 
 === MinimOSD Config tool ===
 || *Date* || *File* || *Size* || *Label* ||
+|| 16.03.2014 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.4.0.0_20140616.zip Config_tool_v2.4.0.0_20140616.zip]||  539 Ko || Stable ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.3.0.6_20140125.zip Config_tool_v2.3.0.6_20140125.zip]|| 1.46 Mo || Stable ||
-|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.1.2.0_20131106.zip Config_tool_v2.1.2.0_20131106.zip]|| 505 Ko || Stable ||
+|| 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/Config_tool_v2.1.2.0_20131106.zip Config_tool_v2.1.2.0_20131106.zip]||  505 Ko || Stable ||
 
 === MinimOSD ===
 || *Date* || *File* || *Size* || *Label* ||
+|| 16.03.2014 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.4_r736.zip MinimOSD_V2.4_r736.zip]|| 722 Ko || Stable ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.4.zip MinimOSD_V2.4.zip]|| 719 Ko || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/MinimOSD_V2.0.zip MinimOSD_V2.0.zip]|| 766 Ko || Stable ||
 
 
 === Release Notes ===
+16.03.2014 - v2.2 ([http://code.google.com/p/bagaosd/source/detail?r=21 r21])
+ * Naza tilt compensation is default to FALSE (tilt compensation is experimental, so heading use COG instead of compass information)
+ * Change gimbal default gain for better precision (set it to 20 in Naza GUI for Pitch/Roll)
+ * Copter is armed when throttle is above 15%
+ * Use last release (r736 - v2.4.0.0) of minimosd-extra 
+ * Change the way of computing flight time is minimosd-extra (flight time is counted when throttle is above 15%, and stop when bellow)
+ * For RSSI, use Mavlink RSSI in minimosd-extra config tool
+ 
 14.02.2014 - v2.1 (beta)
  * Ability to switch pannel in MinimOSD (ch8)
  * No more calibration for artificial horizon 

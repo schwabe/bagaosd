@@ -10,7 +10,7 @@ Please use the minimosd-extra [http://code.google.com/p/minimosd-extra/wiki/inde
 BagaOSD come with a slighly modified version of minimosd-extra, BagaOSD use MavLINK 1.0 to comunicate with MinimOSD, so all upcoming version of minimosd-extra should be usable.
 
 
-List of things modified in the minimosd-extra version coming with BagaOSD (modifications made from r627 / Copter: 2.4 stable release):
+List of things modified in the minimosd-extra version coming with BagaOSD (modifications made from r736 / Copter: 2.4 stable release):
 
  * GPS HDOP horizontal (GPS quality signal) 
  * Battery picture (6 positions)
@@ -18,7 +18,9 @@ List of things modified in the minimosd-extra version coming with BagaOSD (modif
  * *"atti"* mode is displayed instead of  *"alth"* (osd_mode 2)
  * *"gpsa"* mode is displayed instead of  *"loit"* (osd_mode 5)
  * *"fail"* mode is displayed instead of  *"retl"* (osd_mode 6)
+ * Change flight time computing
 
+For RSSI, use Mavlink RSSI in minimosd-extra config tool
 To display RSSI Signal bar, you should uncheck "RSSI Enable Raw" in the config panel of minimosd-extra config tool.
 
 == OSD Toggle Channel ==

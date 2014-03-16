@@ -105,7 +105,7 @@ void checkRSSI() {
 //Read voltage and current
 void checkBattVolt(){ 
   //Voltage sensor
-  static int VintervalVCC = -1;
+  static int VintervalVCC = -1; //5160; //-1;
   if( VintervalVCC == -1) VintervalVCC = readVcc(); //Read internal reference once, otherwise there a problem with "NazaDecoderLib.h"
   VRaw=analogRead(VOLTAGE_PIN);
   
@@ -125,7 +125,7 @@ void checkBattVolt(){
 
   //Current sensor 
   #if !defined(ESTIMATE_BATTERY_REMAINING) || ESTIMATE_BATTERY_REMAINING != ENABLED
-    static int IintervalVCC = -1;
+    static int IintervalVCC = -1; //5160; //-1;
     if( IintervalVCC == -1) IintervalVCC = readVcc(); //Read internal reference once, otherwise there a problem with "NazaDecoderLib.h"
     IRaw=analogRead(CURRENT_PIN);
     
