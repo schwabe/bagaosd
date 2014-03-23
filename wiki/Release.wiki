@@ -5,9 +5,12 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 {{{
 #define NAZA_COMPASS_TILT_COMP     FALSE
 }}}
+
+23.03.2014 : New update for BagaOSD_V2.2.zip
+
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 16.03.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.2.zip BagaOSD_V2.2.zip]|| 722 Ko || Stable ||
+|| 23.03.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.2.zip BagaOSD_V2.2.zip]|| 707 Ko || Stable ||
 || 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.0.zip BagaOSD_V2.0.zip]|| 703 Ko || Stable ||
 || 06.11.2013 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V1.0.zip BagaOSD_V1.0.zip]|| 753 Ko || Stable ||
