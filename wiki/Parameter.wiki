@@ -197,8 +197,8 @@ The following paramters were set in Naza for Gimbal output
 
 *Automatic Gain control*
 ||*Output*||*Gain*||*Direction*||
-||Pitch||12||Normal||
-||Roll||7.6||Normal||
+||Pitch||20||Normal||
+||Roll||20||Normal||
 
 *Manual Control Speed*
 ||*Output*||*Gain*||
