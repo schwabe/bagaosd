@@ -66,3 +66,16 @@ enum PPM_ORDERED_CHANNEL_COMPUTE {
 #define FLIGHTMODE_GPS_MODE        5 
 
 #define FLIGHTMODE_FAIL_MODE       6
+
+
+//Analog measure
+#define RSSI_PIN_ANALOG_POS  0
+#define VOLT_PIN_ANALOG_POS  1
+#define CURR_PIN_ANALOG_POS  2
+
+#define NUMBER_ANALOG_PIN    3
+#define ANALOG_DEF_VAL       0,0,0   
+#define NO_ANALOG_PIN        255
+#define ANALOG_PIN_DEF_VAL   NO_ANALOG_PIN,NO_ANALOG_PIN,NO_ANALOG_PIN
+
+

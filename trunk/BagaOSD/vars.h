@@ -20,8 +20,8 @@ float lon=0;
 float alt_MSL_m=0;
 long iTOW=0;
 float alt_m=0;
-short hdop_cm=65535;
-short vdop_cm=65535;
+short eph_cm=65535;
+short epv_cm=65535;
 float speed_3d=0;
 float ground_speed_ms=0;
 float heading_d=90.0;
@@ -35,3 +35,15 @@ int time_hour=0;
 int time_minute=0;
 int time_second=0;
 uint8_t numsats=0;
+unsigned long fix_time=0;
+float alt_Home_m=0;
+int home_set=0;
+
+//For telemetry
+int isArmed = 0;     // Is motors armed flag
+int throttle_pwm=0; 
+uint16_t battery_remaining_A = 0;
+float ampbatt_A = 0; //Conso courante
+
+long intervalVCC=1;
+uint16_t analogValues[NUMBER_ANALOG_PIN] = {ANALOG_DEF_VAL};
