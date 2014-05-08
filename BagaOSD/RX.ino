@@ -1,8 +1,8 @@
 volatile uint16_t rcValueSTD[RC_CHANS_STD] = {1502, 1502, 1502, 1502, 1502}; // interval [1000;2000]
-static uint8_t PCInt_RX_Pins[PCINT_PIN_COUNT] = {PCINT_RX_BITS}; //pin 2 / 4 / 5 / 6 / 7 // if this slowes the PCINT readings we can switch to a define for each pcint bit
+const uint8_t PCInt_RX_Pins[PCINT_PIN_COUNT] = {PCINT_RX_BITS}; //pin 2 / 4 / 5 / 6 / 7 // if this slowes the PCINT readings we can switch to a define for each pcint bit
 
 volatile uint16_t rcValuePPM[RC_CHANS_PPM] = {1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502, 1502}; // interval [1000;2000]
-static uint8_t rcChannelPPM[RC_CHANS_PPM] = {SERIAL_SUM_PPM};
+const uint8_t rcChannelPPM[RC_CHANS_PPM] = {SERIAL_SUM_PPM};
 
 unsigned long lastcomputetime=0;
 
@@ -37,12 +37,13 @@ ISR(RX_PC_INTERRUPT) { //this ISR is common to every receiver channel, it is cal
   uint8_t mask;
   uint8_t pin;
   uint16_t cTime,dTime;
-  static uint16_t edgeTime[RC_CHANS_STD]; //5
+  static volatile uint16_t edgeTime[RC_CHANS_STD]; //5
   static uint8_t PCintLast;
 
   pin = RX_PCINT_PIN_PORT; // RX_PCINT_PIN_PORT indicates the state of each PIN for the arduino port dealing with Ports digital pins
  
   mask = pin ^ PCintLast;   // doing a ^ between the current interruption and the last one indicates wich pin changed
+  //PCintLast = pin;          // we memorize the current state of all PINs [D0-D7]
   cTime = micros();         // micros() return a uint32_t, but it is not usefull to keep the whole bits => we keep only 16 bits
   sei();                    // re enable other interrupts at this point, the rest of this interrupt is not so time critical and can be interrupted safely
   PCintLast = pin;          // we memorize the current state of all PINs [D0-D7]
@@ -166,7 +167,7 @@ void analyseRC() {
         rcDataSTD[THROTTLE_STD] = rcDataPPM[THROTTLE_PPM];
         rcDataSTD[FMODE_STD] = rcDataPPM[FMODE_PPM];
     #endif
-    
+    throttle_pwm = rcDataSTD[THROTTLE_STD];
     if( currtime - lastcomputetime > 30 ) { //Should be more than 27, because PPM Sum can be 27ms long
         handleStableFlightMode();
         lastcomputetime = currtime;

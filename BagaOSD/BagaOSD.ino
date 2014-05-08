@@ -1,9 +1,9 @@
 #include <inttypes.h>
-#include "vars.h"
 #include "def.h"
+#include "vars.h"
 #include "config.h"
-#include <RSSIFilter.h> 
 #include <SendOnlySoftwareSerial.h> //Same as SoftwareSerial, but send only data. Used to send data to MinimOSD
+
 
 //#define DEBUG_SENSOR			//uncomment to enable debugging output to console and stop MAVLink messages from being transmitted
 //#define DEBUG_LOOP
@@ -23,6 +23,10 @@
 //D8-D13 OK not used by PCINT2_vect, D0-D7 KO, used by PCINT2_vect (RX.ino) and Serial
 SendOnlySoftwareSerial minimosd(8);
 
+#if defined(FRSKY_PROTOCOL)
+SendOnlySoftwareSerial sendTelemetry(9, true);
+#endif
+
 #define MAVLINK_USE_CONVENIENCE_FUNCTIONS
 mavlink_system_t mavlink_system;
 static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
@@ -36,15 +40,15 @@ static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 }
 #include "../GCS_MAVLink/include/mavlink/v1.0/common/mavlink.h"
 
-static int16_t rcDataSTD[RC_CHANS_STD];    // interval [1000;2000]
-static int16_t rcDataPPM[RC_CHANS_PPM];    // interval [1000;2000]
+int16_t rcDataSTD[RC_CHANS_STD];    // interval [1000;2000]
+int16_t rcDataPPM[RC_CHANS_PPM];    // interval [1000;2000]
 
 float VFinal = 0;
 float IFinal = 0;
 
-RSSIFilter rssiFilter(RSSI_RC_FILTER, RSSI_RSSI_MAX, RSSI_SCALE_MIN, RSSI_SCALE_MAX); //PWM rssi
 RunningUintAverage VFinalUint(VOLTAGE_BUFFER); //Average voltage
 RunningUintAverage IFinalUint(CURRENT_BUFFER); //Average current
+RunningUintAverage RFinalUint(RSSI_BUFFER); //Average RSSI
 
 void setup() {
   configureReceiver();
@@ -57,13 +61,12 @@ void setup() {
     Serial.begin(57600);            //Raw reads (57600 bauds) GPS on RX, transmits output on TX
   #endif
 
-  
-  #if defined(RSSI_USE_PWM) && RSSI_USE_PWM == ENABLED 
-    pinMode(RSSI_PIN_PWM,INPUT);      //RSSI PWM pin
-    digitalWrite(RSSI_PIN_PWM,HIGH);  //internal pullup enable
-    rssiFilter.clear();
+  #if defined(FRSKY_PROTOCOL)
+    sendTelemetry.begin(9600);
   #endif
-
+  
+  init_analog();
+  
   VFinalUint.clear();
   IFinalUint.clear();
 
@@ -76,6 +79,7 @@ void computeData() {
     analyseRC();         //Compute radio channel
     checkRSSI();         //Compute RSSI
     checkFlightMode();   //Compute Flight Mode
+    read_analog(millis());
     checkBattVolt();     //Compute Voltage and Current
     checkThrottle();     //Compute thottle percent
 
@@ -93,7 +97,10 @@ void computeData() {
 
 void loop(){
     computeData();   
-
+    #if defined(FRSKY_PROTOCOL)
+      update_FrSky();
+    #endif
+    
     #if defined(DEBUG_GPS)
     unsigned long currtime_gps=millis();
     static unsigned long last_sent_current_time_gps=0;

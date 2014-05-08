@@ -90,27 +90,24 @@ void checkThrottle() {
 
 //Read RSSI value
 void checkRSSI() {
-    #if RSSI_USE_PWM == ENABLED
-       rssiFilter.computeSignal(pulseIn(RSSI_PIN_PWM, HIGH, 200));
-       receiver_rssi = rssiFilter.getPercentCurvedSignal();
-    #else    
-      #if RSSI_PIN_ANALOG != -1  
-        float ret = analogRead(RSSI_PIN_ANALOG);
-        ret = ret * 0.25;
-        receiver_rssi = constrain(ret, 0, 255);
-      #endif
+    float ret = analogValues[RSSI_PIN_ANALOG_POS];
+    #if !defined(RSSI_RAW_VAL) || RSSI_RAW_VAL != TRU
+      ret = min(ret, RSSI_MAX_VAL);
+      ret = max(ret, RSSI_MIN_VAL);
+      ret = abs(100.0 * (ret - RSSI_VAL_LOW)/ (RSSI_MAX_VAL - RSSI_MIN_VAL));
     #endif
+
+    RFinalUint.addValue(ret);
+    receiver_rssi = RFinalUint.getAverage(); 
 }
 
 //Read voltage and current
 void checkBattVolt(){ 
   //Voltage sensor
-  static int VintervalVCC = -1; //5160; //-1;
-  if( VintervalVCC == -1) VintervalVCC = readVcc(); //Read internal reference once, otherwise there a problem with "NazaDecoderLib.h"
-  VRaw=analogRead(VOLTAGE_PIN);
+  VRaw=analogValues[VOLT_PIN_ANALOG_POS];
   
   #if defined(INTERNAL_VOLTAGE_REF)
-    float Vcorrected = (VRaw * VintervalVCC) / INTERNAL_VOLTAGE_REF;
+    float Vcorrected = (VRaw * intervalVCC) / INTERNAL_VOLTAGE_REF;
   #else
     float Vcorrected = VRaw;
   #endif
@@ -125,12 +122,10 @@ void checkBattVolt(){
 
   //Current sensor 
   #if !defined(ESTIMATE_BATTERY_REMAINING) || ESTIMATE_BATTERY_REMAINING != ENABLED
-    static int IintervalVCC = -1; //5160; //-1;
-    if( IintervalVCC == -1) IintervalVCC = readVcc(); //Read internal reference once, otherwise there a problem with "NazaDecoderLib.h"
-    IRaw=analogRead(CURRENT_PIN);
+    IRaw=analogValues[CURR_PIN_ANALOG_POS];
     
     #if defined(INTERNAL_VOLTAGE_REF)
-      float Icorrected = (IRaw * IintervalVCC) / INTERNAL_VOLTAGE_REF;
+      float Icorrected = (IRaw * intervalVCC) / INTERNAL_VOLTAGE_REF;
     #else
       float Icorrected = IRaw;
     #endif
@@ -146,7 +141,7 @@ void checkBattVolt(){
                 Serial.print("  <>  ");
                 Serial.print(VFinalUint.getAverage());
                 Serial.print("  <>  ");
-                Serial.println(VintervalVCC);
+                Serial.println(intervalVCC);
 		
                 #if ESTIMATE_BATTERY_REMAINING == ENABLED
 		  Serial.print("Estimated pack remaining (%): ");
@@ -157,7 +152,7 @@ void checkBattVolt(){
                   Serial.print("  <>  ");
                   Serial.print(IFinalUint.getAverage());
                   Serial.print("  <>  ");
-                  Serial.println(IintervalVCC);
+                  Serial.println(intervalVCC);
                 #endif
                 Serial.println("----------------");
 		lastchecked=millis();
@@ -202,35 +197,4 @@ int estimatepower(){
 	if(cellvolt>390)remaining=90;
 	if(cellvolt>405)remaining=100;
 	return remaining;
-}
-
-//Read internal Vref, to get accurate value with analogRead
-//http://provideyourown.com/2012/secret-arduino-voltmeter-measure-battery-voltage/
-//http://code.google.com/p/tinkerit/wiki/SecretVoltmeter
-long readVcc() {
-  // Read 1.1V reference against AVcc
-  // set the reference to Vcc and the measurement to the internal 1.1V reference
-  #if defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-    ADMUX = _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-  #elif defined (__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-    ADMUX = _BV(MUX5) | _BV(MUX0);
-  #elif defined (__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-    ADMUX = _BV(MUX3) | _BV(MUX2);
-  #else
-    ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
-  #endif  
- 
-  delay(2); // Wait for Vref to settle
-  ADCSRA |= _BV(ADSC); // Start conversion
-  while (bit_is_set(ADCSRA,ADSC)); // measuring
- 
-  uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH  
-  uint8_t high = ADCH; // unlocks both
- 
-  long result = (high<<8) | low;
- 
-  // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000 or scale_constant = internal1.1Ref * 1023 * 1000
-  // internal1.1Ref = 1.1 * Vcc1 (per voltmeter) / Vcc2 (per readVcc() function)
-  result = 1125300L / result; 
-  return result; // Vcc in millivolts
 }

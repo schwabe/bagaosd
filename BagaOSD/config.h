@@ -1,16 +1,16 @@
-//RSSI Choice (PWM or Analog)
-#define RSSI_USE_PWM               ENABLED     //Use PWM to decode RSSI signal. This can be commented to use instead analog RSS
-
-//RSSI PWM config
-#define RSSI_PIN_PWM               12       //RSSI PWM digital pin number 
-#define RSSI_RC_FILTER             8000    //RSSI constant to analyse PWM RSSI signal (https://sites.google.com/site/arduinorccar/lowpassfilter)
-#define RSSI_RSSI_MAX              135      //RSSI Max signal value
-#define RSSI_SCALE_MIN             3.5       //Min value for Sigmoid function
-#define RSSI_SCALE_MAX             -2      //Max value for Sigmoid function
-
+//Send FrSky telemetry data  
+#define FRSKY_PROTOCOL            //Send telemetry data to FrSky radio
+//#define FRSKY_DMS               //DMS (48°N52'13.782) or NMEA (48°52.1378N) - Default NMEA
+//#define FRSKY_IMPERIALS         //Default Metrics
+//#define FRSKY_FLD02             //Uncomment if FLD_02 is used (leave commented for TARANIS)
 
 //RSSI Analog config
-#define RSSI_PIN_ANALOG            A2   //RSSI_USE_PWM must be disabled to use it. -1 to disable, or A0, A1, A2, A3 (default A2)
+#define RSSI_PIN_ANALOG            A2   //Analog PIN for RSSI : A0, A1, A2, A3 (default A2)
+#define RSSI_MIN_VAL               350  //RSSI min displayed value. This value can either represent a RSSI min or max signal, it doesn't matter.
+#define RSSI_MAX_VAL               670  //RSSI max displayed value. This value can either represent a RSSI min or max signal, it doesn't matter.
+#define RSSI_VAL_LOW               RSSI_MIN_VAL //This value should represent the value when the signal is the lowest (RSSI_MIN_VAL or RSSI_MAX_VAL)
+//#define RSSI_RAW_VAL               TRUE  //If you want to use raw RSSI value, instead of percent computed value
+#define RSSI_BUFFER                16  //RSSI internal buffer to smooth output
 
 //Radio receiver information
 #define RC_PPM_MODE                ENABLED      //Decode PPM Sum with arduino pin 2. This can be commented to use standard RX configuration instead of PPM Sum configuration.
@@ -68,7 +68,6 @@ Pin 5           :   Gimbal pitch for horizon display (it's not a PPM Sum signal)
 
 RSSI Configuration 
 Pin A2          :   Analog RSSI (#define RSSI_PIN_ANALOG)
-Pin 12          :   PWM RSSI    (#define RSSI_PIN_PWM)
 
 Sensor
 Voltage sensor  :   A0 (#define VOLTAGE_PIN)

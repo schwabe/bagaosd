@@ -12,7 +12,6 @@ https://code.google.com/p/minimosd-extra/wiki/APM
 
 **/
 
-
 void sendMavlinkMessages() {
   unsigned long currtime=millis();
   
@@ -24,6 +23,17 @@ void sendMavlinkMessages() {
 
   mavlink_system.sysid = 100; // System ID, 1-255
   mavlink_system.compid = 50; // Component/Subsystem ID, 1-255
+  
+  //Compute last time 3D Fix and copter is about to move
+  if( !((gpsFix >= 3) && (throttlepercent > 10)) ) {
+    fix_time = currtime;
+  }
+  
+  //Set home altitude if not already set, and 3D fix and copter moving for more than 1s
+  if( (home_set == 0) && (currtime - fix_time) > 1000 ) {
+    alt_Home_m = alt_MSL_m;
+    home_set = 1;
+  } 
   
   //1hz for mavlink heart beat
   if(currtime - heartbeat_1hz >= 1000){
@@ -37,6 +47,7 @@ void sendMavlinkMessages() {
   if(currtime - heartbeat_2hz >= 500){
     sendGpsData();
     sendVfrHud();
+    sendGlobalPosition();
     heartbeat_2hz = currtime;
     dimming = currtime;
   } 
@@ -65,6 +76,34 @@ void sendMavlinkMessages() {
 }
 
 
+//MAVLINK_MSG_ID_GLOBAL_POSITION_INT
+/**
+ * Send a global_position_int message
+ * chan MAVLink channel to send the message
+ *
+ * time_boot_ms Timestamp (milliseconds since system boot)
+ * lat Latitude, expressed as * 1E7
+ * lon Longitude, expressed as * 1E7
+ * alt Altitude in meters, expressed as * 1000 (millimeters), above MSL
+ * relative_alt Altitude above ground in meters, expressed as * 1000 (millimeters)
+ * vx Ground X Speed (Latitude), expressed as m/s * 100
+ * vy Ground Y Speed (Longitude), expressed as m/s * 100
+ * vz Ground Z Speed (Altitude), expressed as m/s * 100
+ * hdg Compass heading in degrees * 100, 0.0..359.99 degrees. If unknown, set to: 65535
+ */
+void sendGlobalPosition() {
+    mavlink_msg_global_position_int_send(
+        MAVLINK_COMM_0,
+        millis(), 
+        (long)(lat*10000000), 
+        (long)(lon*10000000), 
+        (long)(alt_MSL_m*1000.0), 
+        (long)((alt_MSL_m - alt_Home_m)*1000.0), 
+        0, //Unknown, so not set
+        0, //Unknown, so not set 
+        0, //Unknown, so not set
+        heading_d * 100.0);
+}
 
 //Send MAVLink Heartbeat, 1hz 
 //MAVLINK_MSG_ID_HEARTBEAT
@@ -94,6 +133,9 @@ void sendHeartBeat() {
   //Consider copter armed when there's some throttle
   if( throttlepercent > 10 ) {
     mav_base_mode = mav_base_mode | MAV_MODE_FLAG_SAFETY_ARMED;
+    isArmed = 1;
+  } else {
+    isArmed = 0;
   }
   
   mavlink_msg_heartbeat_send(
@@ -131,8 +173,8 @@ void sendGpsData() {
     (long)(lat*10000000), 
     (long)(lon*10000000), 
     (long)(alt_MSL_m*1000.0), 
-    hdop_cm,
-    vdop_cm, 
+    eph_cm,
+    epv_cm, 
     ground_speed_ms * 100.0, 
     cog_cd, 
     numsats);
@@ -224,10 +266,13 @@ void sendVfrHud() {
 void sendSystemStatus() {
 	//current is in ma.  Function needs to send in ma/10.
 	#if ESTIMATE_BATTERY_REMAINING == ENABLED
-	    mavlink_msg_sys_status_send(MAVLINK_COMM_0,0,0,0,0,long(VFinal*1000.0),0 ,estimatepower(),0,0,0,0,0,0); 
+            battery_remaining_A = estimatepower();
+            ampbatt_A = 0;
 	#else
-	    mavlink_msg_sys_status_send(MAVLINK_COMM_0,0,0,0,0,long(VFinal*1000.0),IFinal*100.0,capacity/LIPO_CAPACITY_MAH*100.0,0,0,0,0,0,0);
-    #endif
+            battery_remaining_A = capacity/LIPO_CAPACITY_MAH*100.0;
+            ampbatt_A = IFinal;
+        #endif
+        mavlink_msg_sys_status_send(MAVLINK_COMM_0,0,0,0,0,long(VFinal*1000.0),ampbatt_A*100.0,battery_remaining_A,0,0,0,0,0,0);
 }
 
 

@@ -41,8 +41,8 @@ void decode_gps_naza(void) {
 	lat             = NazaDecoder.getLat();
         alt_m           = NazaDecoder.getAlt();
         alt_MSL_m       = alt_m; //This information is not set in NazaDecoder lib, so we use alt instead
-        vdop_cm         = NazaDecoder.getVdop() * 100;
-        hdop_cm         = NazaDecoder.getHdop() * 100;
+        epv_cm          = NazaDecoder.getVdop() * 100;
+        eph_cm          = NazaDecoder.getHdop() * 100;
         ground_speed_ms = NazaDecoder.getSpeed();
         numsats         = NazaDecoder.getNumSat();
         climb           = NazaDecoder.getClimbSpeed();
@@ -188,8 +188,8 @@ void parse_ubx_gps()
 		numsats=UBX_buffer[47];
 	}
 	if (UBX_id==0x04) { //DOP
-		hdop_cm=(short)join_2_bytes(&UBX_buffer[12]);  //in CM?
-		vdop_cm=(short)join_2_bytes(&UBX_buffer[10]);  //in CM?
+		eph_cm=(short)join_2_bytes(&UBX_buffer[12]);  //in CM?
+		epv_cm=(short)join_2_bytes(&UBX_buffer[10]);  //in CM?
 	}
 	if(UBX_id==0x12){ // ID NAV-VELNED
 	        climb           = (float)join_4_bytes(&UBX_buffer[12])/100.0; 
