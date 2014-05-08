@@ -20,7 +20,7 @@ Uncomment this, if you wish to send !FrSky telemetry information (of course only
 #define FRSKY_PROTOCOL
 }}}
 
-You can either display GPS information (for Taranis) in DMS (48&deg;N52'13.782) or NMEA (48&deg;52.1378N) information. Default is NMEA
+You can either display GPS information (for Taranis) in DMS (48°N52'13.782) or NMEA (48°52.1378N) information. Default is NMEA
 {{{
 //#define FRSKY_DMS
 }}}
