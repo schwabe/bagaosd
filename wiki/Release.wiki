@@ -10,6 +10,7 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
+|| 08.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.0.zip BagaOSD_V3.0.zip]|| 774 Ko || Beta ||
 || 23.03.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.2.zip BagaOSD_V2.2.zip]|| 707 Ko || Stable ||
 || 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||
 || 25.01.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.0.zip BagaOSD_V2.0.zip]|| 703 Ko || Stable ||
@@ -30,6 +31,14 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 
 
 === Release Notes ===
+08.05.2014 - v3.0 ([http://code.google.com/p/bagaosd/source/detail?r=24 r24])
+ * !FrSky telemetry added
+ * RSSI PMW is not any more used. Instead use a RSSI Filter and connect it to an analog Pin
+ * RSSI can be displayed as raw or percent values
+ * RSSI value are buffered (to smooth output values)
+ * Internal analog read are done with interrupt
+ * Minor bugs fixed
+ 
 16.03.2014 - v2.2 ([http://code.google.com/p/bagaosd/source/detail?r=21 r21])
  * Naza tilt compensation is default to FALSE (tilt compensation is experimental, so heading use COG instead of compass information)
  * Change gimbal default gain for better precision (set it to 20 in Naza GUI for Pitch/Roll)

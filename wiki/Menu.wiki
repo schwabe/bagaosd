@@ -9,4 +9,5 @@
     * [Build BagaOSD picture]
   * [Parameter Arduino parameter]
   * [MinimOSD What about MinimOSD]
+  * [FrSky FrSky Telemetry]
   * [Release BagaOSD download]

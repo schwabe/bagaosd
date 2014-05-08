@@ -72,10 +72,11 @@ If you don't have any voltage sensor, you can build it with resistors ([http://e
 
 RSSI information can be displayed from an analog source or a PWM source (like !FrSky receiver)
 
-If your RSSI source is analog then connect it to PIN A2 (_*be careful this source shouldn't provide voltage above 5V*_), if it's numerical connect it to PIN 12.
+If your source is a PWM source, than you should build a RSSI filter with a resistor and a capacitor before connecting to an arduino analog pin.
 
-Numerical RSSI signal output can be modified if you want it more linear (see the RSSI [Parameter parameter])
+[http://bagaosd.googlecode.com/svn/files/frsky_rssi_filter.jpg]
 
+Connect your RSSI source to PIN A2 (_*be careful this source shouldn't provide voltage above 5V*_).
 
 
 ----

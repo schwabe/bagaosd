@@ -12,38 +12,68 @@ Use arduino IDE (http://arduino.cc/en/main/software) to compile and upload your 
 
 Modify file *config.h* according to your needs 
 ----
+=== !FrSky telemetry ===
+You can send telemetry data to your !FrSky receiver, and then receive those informations to your Taranis radio or your FLD_02 screen
+
+Uncomment this, if you wish to send !FrSky telemetry information (of course only working with !FrSky telemtry module)
+{{{
+#define FRSKY_PROTOCOL
+}}}
+
+You can either display GPS information (for Taranis) in DMS (48°N52'13.782) or NMEA (48°52.1378N) information. Default is NMEA
+{{{
+//#define FRSKY_DMS
+}}}
+
+If your Taranis radio is displayed information in Imperials units, you should uncomment this line. Default is Metrics  
+{{{
+//#define FRSKY_IMPERIALS
+}}}
+
+Uncomment if FLD_02 is used (leave commented for TARANIS)
+{{{
+//#define FRSKY_FLD02
+}}}
+
+----
 === RSSI Choice (PWM or Analog) ===
 ==== PWM Rssi ====
-Set it to ENABLED if you are using a PWM RSSI source (numerical). 
+If you're using a PWM rssi signal, you need to convert it to an analog signal, this can be done by a rssi filter.
 
-If you're using an analog source or you don't use any RSSI information, you can comment this part (put // in front of *#define RSSI_USE_PWM*)
-
-{{{
-#define RSSI_USE_PWM               ENABLED
-}}}
-
-Set the numerical PIN number (default 12) if you are using PWM RSSI source (numerical). Only used if *RSSI_USE_PWM* is ENABLED
-{{{
-#define RSSI_PIN_PWM               12
-}}}
+[http://bagaosd.googlecode.com/svn/files/frsky_rssi_filter.jpg]
 
 
-Internal buffer to smooth PWM RSSI signal. Only used if *RSSI_USE_PWM* is ENABLED
-
-{{{
-#define RSSI_RC_FILTER             8000    //RSSI constant to analyse PWM RSSI signal 
-#define RSSI_RSSI_MAX              135      //RSSI Max signal value
-#define RSSI_SCALE_MIN             3.5       //Min value for Sigmoid function
-#define RSSI_SCALE_MAX             -2      //Max value for Sigmoid function
-}}}
-
-==== Analog Rssi ====
+==== Rssi parameters ====
 Set the analog PIN (default A2) you want to use to read RSSI analog source. 
 
-This part is ignored if *RSSI_USE_PWM* is *ENABLED*. If you don't need to display RSSI, assign -1 value (*#define RSSI_PIN_ANALOG -1*)
-
+If you don't need to display RSSI, assign -1 value (*#define RSSI_PIN_ANALOG -1*)
 {{{
 #define RSSI_PIN_ANALOG            A2
+}}}
+
+RSSI min read value. This value can either represent a RSSI min or max signal, it doesn't matter.
+{{{
+#define RSSI_MIN_VAL               350  
+}}}
+
+RSSI max read value. This value can either represent a RSSI min or max signal, it doesn't matter.
+{{{
+#define RSSI_MAX_VAL               670  
+}}}
+
+This value should represent the min signal value (RSSI_MIN_VAL or RSSI_MAX_VAL)
+{{{
+#define RSSI_VAL_LOW               RSSI_MIN_VAL 
+}}}
+
+If you want to use raw RSSI value, instead of percent computed value
+{{{
+//#define RSSI_RAW_VAL               TRUE 
+}}}
+
+RSSI internal buffer to smooth output
+{{{
+#define RSSI_BUFFER                16  
 }}}
 
 

@@ -51,6 +51,8 @@ All the [Parameter configuration] is done in a single file "config.h". Of course
 || 5 || Gimbal pitch for horizon display || 
 || 6 || MinimOSD Panel Switch || 
 || 7 || FMode (Flight mode : Acro / Atti / Gps / Failsafe) - Flight Mode ||
+|| 8 || Serial data to MinimOSD ||
+|| 9 || Serial telemetry data to !FrSky receiver ||
 
 === Arduino with standard receiver ===
 [http://bagaosd.googlecode.com/svn/files/arduino_std.png]
@@ -62,6 +64,8 @@ All the [Parameter configuration] is done in a single file "config.h". Of course
 || 2 || PPM Sum signal from receiver || 
 || 4 || Gimbal roll for horizon display (it's not a PPM Sum signal)|| 
 || 5 || Gimbal pitch for horizon display (it's not a PPM Sum signal)|| 
+|| 8 || Serial data to MinimOSD ||
+|| 9 || Serial telemetry data to !FrSky receiver ||
 
 === Arduino with PPM Sum receiver ===
 [http://bagaosd.googlecode.com/svn/files/arduino_ppm.png]
@@ -70,7 +74,6 @@ All the [Parameter configuration] is done in a single file "config.h". Of course
 == RSSI Configuration ==
 || *PIN* || *Function* || 
 || A2 || Analog RSSI (_{{{#define RSSI_PIN_ANALOG}}}_) || 
-|| 12 || PWM RSSI    (_{{{#define RSSI_PIN_PWM}}}_)|| 
 
 
 == Sensor ==

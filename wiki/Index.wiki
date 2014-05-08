@@ -16,6 +16,7 @@ The arduino code is based on differents projects :
  * RX decoding comes from [https://code.google.com/p/multiwii/ Multiwii]
  * GPS uBlox decoding from [https://code.google.com/p/ardu-imu/ Ardu-IMU]
  * GPS Naza decoding from [http://www.rcgroups.com/forums/showthread.php?t=1995704 pawelsky]
+ * FrSky telemetry data from [https://github.com/evlas/jD-IOBoard Jani Hirvinen]
 
 This project was inspired from [http://firebug24k.com/index.php FBOSD], a plug and play OSD version for DJI Naza. 
 
