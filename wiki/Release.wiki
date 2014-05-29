@@ -10,7 +10,7 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 29.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.1.zip BagaOSD_V3.1.zip]|| 594 Ko || Stable ||
+|| 29.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.1.zip BagaOSD_V3.1.zip]|| 594 Ko || Not to use||
 || 08.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.0.zip BagaOSD_V3.0.zip]|| 774 Ko || Beta ||
 || 23.03.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.2.zip BagaOSD_V2.2.zip]|| 707 Ko || Stable ||
 || 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||
