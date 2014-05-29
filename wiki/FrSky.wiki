@@ -37,10 +37,10 @@ This was tested with Receiver D8R-XP and D8R-II plus, but it should work with an
 
 === Please note ===
 
-||*T2* ||Will alternate display between GPS satellite / 3D fix information and a constant value (999) when home is not set. When home is set, only GPS satellite / 3D fix information are displayed.||
-||*T1* ||Will only display battery size before flight. When copter is armed (throttle >10%) and flight time is above 2s, then display will alternate between battery size and eph||
+|| *T2* ||Will alternate display between GPS satellite / 3D fix information and a constant value (999) when home is not set. When home is set, only GPS satellite / 3D fix information are displayed.||
+|| *T1* ||Will only display battery size before flight. When copter is armed (throttle >10%) and flight time is above 2s, then display will alternate between battery size and eph||
 
-*To change battery size* before flight, put the channel used to change MinimOSD pannel (*Pin7* for standard RX, *AUX* for PPM Sum mode receiver) in hight position (>1800us), battery will change every second.
+*To change battery size* before flight, put the channel used to change MinimOSD pannel (*Pin7* for standard RX, *AUX* for PPM Sum mode receiver) in high position (>1800us), battery will change every second.
 
 == Informations displayed ==
 
@@ -59,8 +59,6 @@ This was tested with Receiver D8R-XP and D8R-II plus, but it should work with an
 || *RSSI* || Standard information computed by Taranis (not sent from BagaOSD). RSSI signal||
 || *T1*   || GPS eph information. Quality GPS signal, not very good if above 220||
 || *AltG* || Altitude above ground. This information is set when copter is armed (throttle >10%) ||
-
-*T2* Will alternate between GPS satellite / 3D fix information and a constant value (999) when home is not set. When home is set, only GPS satellite / 3D fix information are displayed.
 
 
 [http://bagaosd.googlecode.com/svn/files/taranris_02.jpg]
