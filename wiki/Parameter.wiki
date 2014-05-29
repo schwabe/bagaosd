@@ -66,14 +66,9 @@ This value should represent the min signal value (RSSI_MIN_VAL or RSSI_MAX_VAL)
 #define RSSI_VAL_LOW               RSSI_MIN_VAL 
 }}}
 
-If you want to use raw RSSI value, instead of percent computed value
+Uncomment if you want to use raw RSSI value, instead of percent computed value
 {{{
-//#define RSSI_RAW_VAL               TRUE 
-}}}
-
-RSSI internal buffer to smooth output
-{{{
-#define RSSI_BUFFER                16  
+//#define RSSI_RAW_VAL                
 }}}
 
 
@@ -81,15 +76,15 @@ RSSI internal buffer to smooth output
 === Radio receiver information ===
 
 ==== PPM / Standard ====
-Set it to ENABLED if your receiver output PPM (get all the channels information through one port only), this can be commented to use standard RX configuration instead of PPM Sum configuration.
+Uncomment if your receiver output PPM Sum (get all the channels information through one port only), this can be commented to use standard RX configuration instead of PPM Sum configuration.
 
 {{{
-#define RC_PPM_MODE                ENABLED 
+#define RC_PPM_MODE                 
 }}}
 
-Set the channel order if you're using a PPM receiver and *RC_PPM_MODE* is *ENABLED*. 
+Set the channel order if you're using a PPM Sum receiver and *RC_PPM_MODE*.
 
-Only 2 channels are used : *THROTTLE_PPM* (for flight time and throttle percent) and *FMODE_PPM* (for flight mode). But all the channels (THROTTLE / YAW / X1 / X2 / FMODE / AUX4) are transmitted to MinimOSD
+Only 3 channels are used : *THROTTLE_PPM* (for flight time and throttle percent) and *FMODE_PPM* (for flight mode) and *AUX_PPM* (Change MinimOSD panel / change battery size). But all the channels (THROTTLE / YAW / X1 / X2 / FMODE / AUX) are transmitted to MinimOSD
 
 
 So you can use AUX channel to switch pannel inside MinimOSD (choose ch8)
@@ -175,15 +170,22 @@ LIPO capacity in mah to dispaly remaining percent of battery (when a current sen
 #define LIPO_CAPACITY_MAH          8000
 }}}
 
+
+LIPO capacity in mah can be change before flight. Change the battery size with the selector used to change MinimOSD panel (Channel plugged to *Pin7* for standard RX, or *AUX* for PPM Sum receiver)
+
+{{{
+#define LIPO_CAPACITY_MAH_MULTI    LIPO_CAPACITY_MAH,8000,10000  //LIPO capacity in mah selector
+}}}
+
 ----
 === GPS Handler ===
-Choose what method to use to get Naza GPS data, TRUE for [NazaConnector Naza decoding], FALSE for uBlow [uBloxSolder raw decoding]
+Choose what method to use to get Naza GPS data, uncommented for [NazaConnector Naza decoding], commented for uBlow [uBloxSolder raw decoding]
 
-TRUE : Decode Naza GPS Protocol (connector choice)
+Uncommented : Decode Naza GPS Protocol (connector choice)
 
-FALSE : Decode RAW uBlox Message (GPS solder choice)
+Commented : Decode RAW uBlox Message (GPS solder choice)
 {{{
-#define DECODE_NAZA_GPS            TRUE  
+#define DECODE_NAZA_GPS              
 }}}
 
 When using Naza GPS Protocol, Heading (direct compass information) should be tilt compensate, this could be done when Naza Gimbal output is connected to BagaOSD. 
@@ -191,8 +193,10 @@ When using Naza GPS Protocol, Heading (direct compass information) should be til
 Naza Gimbal output is not really accurate, so compass tilt compensation could lead to wrong values. 
 
 If you don't want real heading (NAZA_COMPASS_TILT_COMP set to FALSE), COG will be used instead of heading.
+
+You can also choose a mixte option (MIXTE) to get real heading when copter is not moving, and cog when copter is moving (>2m/s)
 {{{
-#define NAZA_COMPASS_TILT_COMP     FALSE
+#define NAZA_COMPASS_TILT_COMP     FALSE  //TRUE or MIXTE
 }}}
 
 ----
@@ -207,18 +211,18 @@ Those parameters are used to compute throttle percent. Put the min. and max. sig
 === Artificial horizon ===
 The following paramters are used to adjust display of artificial horizon.
 
-INVERT is used to invert the artificial horizon.
+INVERT is used to invert the artificial horizon (uncomment according your needs)
 {{{
 #define PITCH_GAIN                 7.6 
 #define PITCH_LEVEL                1500
-#define PITCH_INVERT               FALSE
+//#define PITCH_INVERT               
 
 #define ROLL_GAIN                  7.6 
 #define ROLL_LEVEL                 1500
-#define ROLL_INVERT                FALSE
+//#define ROLL_INVERT                
 }}}
 
-The following paramters were set in Naza for Gimbal output
+The following parameters were set in Naza for Gimbal output
 
 *Servo travel limit*
 ||*Output*||*Max*||*Center*||*Min*||

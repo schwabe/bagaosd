@@ -42,6 +42,7 @@ With BagaOSD, you can display the following things :
  * Battery remaining (computed from voltage value or extract from current sensor)
  * Battery voltage
  * Artificial horizon
+ * Send !FrSky telemetry data
 
 
 All the warning coming with MinimOSD extra are also available.

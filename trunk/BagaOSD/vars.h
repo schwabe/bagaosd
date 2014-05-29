@@ -42,8 +42,15 @@ int home_set=0;
 //For telemetry
 int isArmed = 0;     // Is motors armed flag
 int throttle_pwm=0; 
+int roll_pwm=0;
+int pitch_pwm=0;
+int panel_pwm=0;
+unsigned long flight_time=0;
+
 uint16_t battery_remaining_A = 0;
 float ampbatt_A = 0; //Conso courante
 
 long intervalVCC=1;
-uint16_t analogValues[NUMBER_ANALOG_PIN] = {ANALOG_DEF_VAL};
+
+int battery_capacity = LIPO_CAPACITY_MAH;
+

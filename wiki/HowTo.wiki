@@ -31,9 +31,9 @@ See picture below for the result of the connection cable
  
 Change the following parameter according to your configuration
 {{{
-#define DECODE_NAZA_GPS            TRUE  
-//TRUE : Decode Naza GPS Protocol (connector choice)
-//FALSE : Decode RAW uBlox Message (solder choice)
+#define DECODE_NAZA_GPS            
+//Uncommented : Decode Naza GPS Protocol (connector choice)
+//Commented: Decode RAW uBlox Message (solder choice)
 }}}
 
 ----
@@ -50,9 +50,9 @@ All the [Parameter configuration] is done in a single file "config.h". Of course
 || 4 || Gimbal roll for horizon display || 
 || 5 || Gimbal pitch for horizon display || 
 || 6 || MinimOSD Panel Switch || 
-|| 7 || FMode (Flight mode : Acro / Atti / Gps / Failsafe) - Flight Mode ||
+|| 7 || FMode (Flight mode : Acro / Atti / Gps / Failsafe) - Flight Mode. Used also to change battery size||
 || 8 || Serial data to MinimOSD ||
-|| 9 || Serial telemetry data to !FrSky receiver ||
+|| 9 || Serial telemetry data to !FrSky receiver (_{{{#define FRSKY_PROTOCOL}}}_) ||
 
 === Arduino with standard receiver ===
 [http://bagaosd.googlecode.com/svn/files/arduino_std.png]
@@ -65,7 +65,7 @@ All the [Parameter configuration] is done in a single file "config.h". Of course
 || 4 || Gimbal roll for horizon display (it's not a PPM Sum signal)|| 
 || 5 || Gimbal pitch for horizon display (it's not a PPM Sum signal)|| 
 || 8 || Serial data to MinimOSD ||
-|| 9 || Serial telemetry data to !FrSky receiver ||
+|| 9 || Serial telemetry data to !FrSky receiver (_{{{#define FRSKY_PROTOCOL}}}_) ||
 
 === Arduino with PPM Sum receiver ===
 [http://bagaosd.googlecode.com/svn/files/arduino_ppm.png]

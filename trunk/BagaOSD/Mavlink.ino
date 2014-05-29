@@ -20,51 +20,59 @@ void sendMavlinkMessages() {
   static unsigned long heartbeat_3hz=0;
   static unsigned long heartbeat_5hz=0;
   static unsigned long dimming = 0;
+  static float alt_MSL_m_last=0;
+  static unsigned long lasttime=0;
 
   mavlink_system.sysid = 100; // System ID, 1-255
   mavlink_system.compid = 50; // Component/Subsystem ID, 1-255
   
-  //Compute last time 3D Fix and copter is about to move
-  if( !((gpsFix >= 3) && (throttlepercent > 10)) ) {
-    fix_time = currtime;
-  }
+  //Home can be set when GPS is 3D fix, and altitude is not changing (within 2m) for more than 1s
+  if(  (gpsFix < 3) || (abs(alt_MSL_m_last - alt_MSL_m) > 2 ) ) {
+    fix_time = currtime + 2000;
+    alt_MSL_m_last = alt_MSL_m;
+  } 
   
-  //Set home altitude if not already set, and 3D fix and copter moving for more than 1s
-  if( (home_set == 0) && (currtime - fix_time) > 1000 ) {
+  //Set home altitude if not already set, and 3D fix and copter moving for more than 500ms
+  if( (home_set == 0) && (currtime > fix_time) ) {
     alt_Home_m = alt_MSL_m;
     home_set = 1;
   } 
   
+  if( isArmed ) {
+    flight_time += (currtime - lasttime);
+  } else {
+    if( flight_time < BATTERY_DISPLAY_FTIME) flight_time = 0;
+  }
   //1hz for mavlink heart beat
-  if(currtime - heartbeat_1hz >= 1000){
+  if(currtime >= heartbeat_1hz ){
     sendHeartBeat();
-    heartbeat_1hz = currtime;
+    heartbeat_1hz = currtime + 1000;
     dimming = currtime;
   } 
   
   //2hz for waypoints, GPS raw, fence data, current waypoint, etc
   //2hz for VFR_Hud data 
-  if(currtime - heartbeat_2hz >= 500){
+  if(currtime >= heartbeat_2hz ){
     sendGpsData();
     sendVfrHud();
     sendGlobalPosition();
-    heartbeat_2hz = currtime;
+    heartbeat_2hz = currtime + 500;
     dimming = currtime;
   } 
   
   //3hz for AHRS, Hardware Status, Wind 
-  if(currtime - heartbeat_3hz >= 333){
+  if(currtime >= heartbeat_3hz){
     sendSystemStatus();
-    heartbeat_3hz = currtime;
+    heartbeat_3hz = currtime + 333;
     dimming = currtime;
   } 
   
   //5hz for attitude and simulation state
   //5hz for radio input or radio output data 
-  if(currtime - heartbeat_5hz >= 200){
+  if(currtime >= heartbeat_5hz ){
     sendAttitude();
     sendRawChannels();
-    heartbeat_5hz = currtime;
+    heartbeat_5hz = currtime + 200;
     dimming = currtime;
   } 
   
@@ -131,7 +139,7 @@ void sendHeartBeat() {
   uint8_t mav_base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED | MAV_MODE_FLAG_GUIDED_ENABLED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED | MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
   
   //Consider copter armed when there's some throttle
-  if( throttlepercent > 10 ) {
+  if( (throttlepercent > 10) ) {
     mav_base_mode = mav_base_mode | MAV_MODE_FLAG_SAFETY_ARMED;
     isArmed = 1;
   } else {
@@ -194,15 +202,19 @@ void sendGpsData() {
 // yawspeed Yaw angular speed (rad/s)
 
 void sendAttitude() {
-	pitch_rad = (rcDataSTD[GIMBALPITCH_STD] - PITCH_LEVEL) * PI/500.0 * PITCH_GAIN / 10.0; ///12.00;      //500 is the difference between vertical and level
-	if(PITCH_INVERT == TRUE) pitch_rad = pitch_rad * -1.0;
+	pitch_rad = (pitch_pwm - PITCH_LEVEL) * PI/500.0 * PITCH_GAIN / 10.0; ///12.00;      //500 is the difference between vertical and level
+	#if defined(PITCH_INVERT)
+          pitch_rad = pitch_rad * -1.0;
+        #endif
 	//need to scale up or down the pitch and roll - a delta of 500 is correct if pitch = 12 and roll is 7.6.  So scale the inputted values by that?
 	//Pitch correction factor = configured pitch gain /12.00
 	//Roll correction factor = configured roll gain / 7.60
 
-	roll_rad = (rcDataSTD[GIMBALROLL_STD] - ROLL_LEVEL) * PI/500.0 * ROLL_GAIN / 10.0; ///7.60;
-	if(ROLL_INVERT == TRUE) roll_rad = roll_rad * -1.0;
-
+	roll_rad = (roll_pwm - ROLL_LEVEL) * PI/500.0 * ROLL_GAIN / 10.0; ///7.60;
+        #if defined(ROLL_INVERT)
+          roll_rad = roll_rad * -1.0;
+        #endif
+	
 	if(pitch_rad<0.05 && pitch_rad>-0.05) pitch_rad=0;
 	if(roll_rad<0.05 && roll_rad > -0.05) roll_rad=0;
 	if(pitch_rad>5) pitch_rad=0;
@@ -269,7 +281,7 @@ void sendSystemStatus() {
             battery_remaining_A = estimatepower();
             ampbatt_A = 0;
 	#else
-            battery_remaining_A = capacity/LIPO_CAPACITY_MAH*100.0;
+            battery_remaining_A = capacity/battery_capacity*100.0;
             ampbatt_A = IFinal;
         #endif
         mavlink_msg_sys_status_send(MAVLINK_COMM_0,0,0,0,0,long(VFinal*1000.0),ampbatt_A*100.0,battery_remaining_A,0,0,0,0,0,0);
@@ -297,23 +309,21 @@ void sendRawChannels() {
         MAVLINK_COMM_0,
         millis(),
         0,        // port 0
-        rcDataSTD[GIMBALROLL_STD],
-        rcDataSTD[GIMBALPITCH_STD],
-        #if RC_PPM_MODE == ENABLED 
+        roll_pwm,
+        pitch_pwm,
+        #if defined(RC_PPM_MODE)
             rcDataPPM[YAW_PPM],       // Yaw
-            rcDataPPM[THROTTLE_PPM],  // Throttle
+            throttle_pwm,  // Throttle
             rcDataPPM[X1_PPM],        // X1
             rcDataPPM[X2_PPM],        // X2
-            rcDataPPM[FMODE_PPM],     // Flight mode
-            rcDataPPM[AUX4_PPM],      // Aux
         #else 
             1500,
-            rcDataSTD[THROTTLE_STD],
+            throttle_pwm,
             1500,
             1500,
-            rcDataSTD[FMODE_STD],
-            rcDataSTD[AUX_STD],
-        #endif
+       #endif
+        rcDataSTD[FMODE_STD],     // Flight mode
+        panel_pwm,       // Aux
         receiver_rssi);
 }
 

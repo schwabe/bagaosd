@@ -1,4 +1,4 @@
-#define DELAY_ANALOG  10
+#define DELAY_ANALOG  12000 //10ms
 
 volatile int adcReading;
 volatile boolean adcDone;
@@ -6,7 +6,7 @@ boolean adcStarted;
 byte adcPin;
 byte lastPin=NO_ANALOG_PIN;
 
-long last_read;
+unsigned long last_read;
 
 //VCC Internal
 boolean init_done = false;
@@ -43,7 +43,7 @@ ISR (ADC_vect) {
     adcDone = true;
 } // end of ADC_vect
 
-void read_analog(long lread) {
+void read_analog(unsigned long lread) {
   // if last reading finished, process it
   if (adcDone) {
     if( !init_done) {
@@ -51,21 +51,33 @@ void read_analog(long lread) {
       // internal1.1Ref = 1.1 * Vcc1 (per voltmeter) / Vcc2 (per readVcc() function)
       intervalVCC = 1125300L / adcReading;  
       init_done = true;
-      last_read = lread;
+      last_read = lread + DELAY_ANALOG;
     } else {
       if( lastPin != NO_ANALOG_PIN ) {
-        analogValues[lastPin] = adcReading;
+        switch(lastPin) {
+          case RSSI_PIN_ANALOG_POS: 
+            checkRSSI(adcReading);
+            break;
+          case VOLT_PIN_ANALOG_POS: 
+            checkBattVolt(adcReading);
+            break;
+          case CURR_PIN_ANALOG_POS: 
+            checkBattCurrent(adcReading);
+            break;
+        }
       }
-        
-      if( lread - last_read > DELAY_ANALOG) {
+      
+      //Read 1 analog value evrey 10ms  
+      if( lread > last_read ) {
         if( adcPin > NUMBER_ANALOG_PIN) adcPin = 0;
         if( analogPin[adcPin] != NO_ANALOG_PIN ) {
           adcDone = false;
           adcStarted = false;
-          last_read = lread;
+          last_read = lread + DELAY_ANALOG;
           lastPin = adcPin;
 
           ADMUX = bit (REFS0) | (analogPin[adcPin] & 0x07);
+          //delay(2); 
         }
         adcPin++;
       }
@@ -78,9 +90,6 @@ void read_analog(long lread) {
     // start the conversion
     if( !init_done ) {
       //Read internal Vref, to get accurate value with analogRead
-      //http://provideyourown.com/2012/secret-arduino-voltmeter-measure-battery-voltage/
-      //http://code.google.com/p/tinkerit/wiki/SecretVoltmeter
-
       // Read 1.1V reference against AVcc
       // set the reference to Vcc and the measurement to the internal 1.1V reference
       ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);

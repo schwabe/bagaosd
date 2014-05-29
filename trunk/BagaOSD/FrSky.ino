@@ -1,4 +1,4 @@
-#if defined(FRSKY_PROTOCOL)
+#if defined(FRSKY_PROTOCOL) 
 /*
 ///////////////////////////////////////////////////////////////////////
 // Copyright (c) 2013, Jani Hirvinen, jDrones & Co.
@@ -55,7 +55,8 @@ struct s_gps_pos {
 s_gps_pos fr_lon;
 s_gps_pos fr_lat;
 
-/*void test_values() {
+#if defined(DEBUG_FRSKY)
+void test_values() {
     isArmed = 1;
   lon = 2.242697; //Ok frsky
   lat = 48.870494; //Ok frsky
@@ -71,14 +72,16 @@ s_gps_pos fr_lat;
   alt_MSL_m=100; //Alt(ok)  Dist(ko), relative Alt (AltG)
   home_set=1;
   ground_speed_ms=15; //100:338 - 184 
-}*/
+}
+#endif
 
 void update_FrSky() {
-//DPL("fr");
   f_curMillis = millis();
   if(f_curMillis - f_preMillis > f_delMillis) {
-      //test_values();
-      
+    #if defined(DEBUG_FRSKY)  
+    test_values();
+    #endif
+    
       #if defined(FRSKY_FLD02)
         fr_speed = (ground_speed_ms * 3.6 / 1.85);
       #else
@@ -96,6 +99,7 @@ void update_FrSky() {
       fr_lat = gpsFormatConvert(lat);
 
       fr_alt_msl = alt_MSL_m + 0.2f;
+      
       fr_alt = (fr_alt_msl - alt_Home_m);
       
       if( VFinal > 0.1 ) {
@@ -155,7 +159,7 @@ void update_FrSky() {
       payloadLen += addPayload(0x19);   // GPS Speed after "."
 
       //Altitude above ground
-      if( home_set == 1) {//first value send is home_altitude, stored in receiver memory
+      if( home_set == 1) {//first value sent is home_altitude, stored in receiver memory
         payloadLen += addPayload(0x01);   // GPS Altitude 
         payloadLen += addPayload(0x09);   // GPS Altitude "."
       }
@@ -215,6 +219,13 @@ byte addPayload(byte DataID) {
       {
         unsigned int fr_eph = eph_cm;
         if( abs(fr_eph) > 9999) fr_eph = 9999;
+        unsigned long currtime=millis();
+        //Display battery size before take off
+        //Otherwise display battery size in alternance with eph (every 2s)
+        if( (flight_time < BATTERY_DISPLAY_FTIME) || (((currtime/1000)%4)<2) ) {
+          fr_eph = battery_capacity;
+        }        
+        
         fr_eph = convertTemperature(fr_eph);
         outBuff[payloadLen + 0] = 0x02; //Signed 16 bit data
         outBuff[payloadLen + 1] = lowByte(fr_eph);
@@ -228,13 +239,14 @@ byte addPayload(byte DataID) {
     // Works as ARMED/DISARMED indicator as if DISARMED RPM value is 0
     case 0x03:  
       outBuff[payloadLen + 0] = 0x03; //Unsigned 16 bit data
+
       if(isArmed) {
         int fr_rpm = throttle_pwm / 30;
         outBuff[payloadLen + 1] = lowByte(fr_rpm);
         outBuff[payloadLen + 2] = highByte(fr_rpm);
       } else {
-        outBuff[payloadLen + 1] = 0x00;
-        outBuff[payloadLen + 2] = 0x00;
+        outBuff[payloadLen + 1] = lowByte(0x00);
+        outBuff[payloadLen + 2] = highByte(0x00);
       }
       addedLen = 3;      
       break;
@@ -254,6 +266,13 @@ byte addPayload(byte DataID) {
     case 0x05: 
       { 
         int fr_gps = 100 * gpsFix + numsats;
+        unsigned long currtime=millis();
+        //Alternative display if home is not set
+        //Otherwise no alternate display for GPS fix and num sats 
+        if( !home_set && (((currtime/1000)%4)<2) ) {
+          fr_gps = 999;
+        }       
+        
         fr_gps = convertTemperature(fr_gps);
         outBuff[payloadLen + 0] = 0x05; //Signed 16 bit data
         outBuff[payloadLen + 1] = lowByte(fr_gps);
@@ -486,19 +505,6 @@ byte sendPayload(byte len) {
 
 
 ////////////////////////////////////////////////////////////
-// ShowPayload() debug function to show constructed payload
-//
-void ShowPayload() {
-#ifdef SERDB  
-   DPN("PL: ");
-   DPN(outBuff[payloadLen + 1], DEC);
-   DPN(", ");
-   DPN(outBuff[payloadLen + 2], DEC);
-   DPL(" "); 
-#endif
-}
-
-////////////////////////////////////////////////////////////
 // updateTime() Time counters for FrSky telemetry
 //
 void updateTime() {
@@ -546,23 +552,6 @@ return (temp - 32.0)/1.8+0.5;
 #else
 return temp;
 #endif
-}
-
-////////////////////////////////////////////////////////////
-// pp() Temporary debug function. Fills HEX output with
-//      leading 0 if output is between 0 - 9
-//
-void pp (byte frameByte) {
-#ifdef SERDB
-  if(frameByte <= 9) DPN("0");
-  DPN(frameByte, HEX);
-#endif  
-}
-void pl (byte frameByte) {
-#ifdef SERDB
-  if(frameByte <= 9) DPN("0");
-  DPL(frameByte, HEX);
-#endif  
 }
 
 #endif

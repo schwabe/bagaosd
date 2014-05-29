@@ -517,7 +517,7 @@ void panOff(){
 void panCur_A(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%5.2f%c", (float(osd_curr_A) * 0.01), 0x0e);
+    osd.printf("%05.2f%c", (float(osd_curr_A) * 0.01), 0x0e);
     osd.closePanel();
 }
 
@@ -702,7 +702,7 @@ osd.closePanel();
 void panThr(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    osd.printf("%3.0i%c",osd_throttle,0x25);
+    osd.printf("%c%3.0i%c",0x02,osd_throttle,0x25);
     osd.closePanel();
 }
 
@@ -737,7 +737,7 @@ void panTime(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
     uint32_t second_flight_time = flight_time/1000; //Airmamaf count flight time when there's some throttle
-    osd.printf("%2i%c%02i",((int)second_flight_time/60)%60,0x3A,(int)second_flight_time%60);
+    osd.printf("%c%2i%c%02i",0x08,((int)second_flight_time/60)%60,0x3A,(int)second_flight_time%60);
     osd.closePanel();
 }
 

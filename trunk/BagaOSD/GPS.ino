@@ -20,12 +20,15 @@ float origin_alt=0;
 
 void decode_gps(void) {
 #if !defined(DEBUG_SENSOR) && !defined(DEBUG_LOOP) 
-    #if defined(DECODE_NAZA_GPS) && DECODE_NAZA_GPS == TRUE
+    #if defined(DECODE_NAZA_GPS) 
         decode_gps_naza();
     #else
         decode_gps_raw();
     #endif
 #endif
+
+  if( alt_MSL_m > 9999) alt_MSL_m=9999;
+  if( alt_MSL_m < -999) alt_MSL_m=-999;
 }
 
 void decode_gps_naza(void) {
@@ -49,16 +52,19 @@ void decode_gps_naza(void) {
         cog_cd          = NazaDecoder.getCog() * 100.0;
         break;
       case NAZA_MESSAGE_COMPASS:
-        #if NAZA_COMPASS_TILT_COMP == TRUE
-          NazaDecoder.setCompensation(pitch_rad, roll_rad); 
-          heading_d     = NazaDecoder.getHeading();
+        #if !defined(NAZA_COMPASS_TILT_COMP) || NAZA_COMPASS_TILT_COMP == FALSE
+            heading_d     = cog_cd / 100.0;
+        #elif NAZA_COMPASS_TILT_COMP == MIXTE
+          if( gpsFix > 2 && ground_speed_ms > 2 ) {
+            heading_d     = cog_cd / 100.0;
+          } else {
+            NazaDecoder.setCompensation(pitch_rad, roll_rad); 
+            heading_d     = NazaDecoder.getHeading();
+          }
         #else
-          heading_d     = cog_cd / 100.0;
+            NazaDecoder.setCompensation(pitch_rad, roll_rad); 
+            heading_d     = NazaDecoder.getHeading();
         #endif
-        
-        /*if( gpsFix > 2 && ground_speed_ms > 2 ) { //Because heading is not tilt compensate, use COG for Heading when GPS Fix and copter is moving more than 7 Km/h
-            heading_d = cog_cd / 100.0;
-        }*/
         break;
     }
   }
