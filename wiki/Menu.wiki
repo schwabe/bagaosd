@@ -2,18 +2,18 @@
 * *Presentation*
  * [Index Introduction]
  * [Detail BagaOSD description]
- * ----
- * *BagaOSD assembly*
+* ----
+* *BagaOSD assembly*
  * [HowTo Introduction]
  * [uBloxSolder GPS soldering]
  * [NazaConnector GPS Adaptor]
  * [ShoppingList Product]
  * [Build BagaOSD picture]
- * ----
- * *Configuration*
+* ----
+* *Configuration*
  * [Parameter Arduino parameter]
  * [MinimOSD What about MinimOSD]
  * [FrSky FrSky Telemetry]
- * ----
- * *Get it*
+* ----
+* *Get it*
  * [Release BagaOSD download]
