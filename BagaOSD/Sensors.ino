@@ -9,6 +9,11 @@ uint32_t pwmFlightMode=1856;        //Current PWM flight mode
 
 int last_flightmode=5;              //Last flight mode before failsafe (if any failsafe)
 
+#if defined(LIPO_CAPACITY_MAH_MULTI)
+const int lipoCapacityMulti[] = {LIPO_CAPACITY_MAH_MULTI};
+const byte lipo_capacity_number=sizeof(lipoCapacityMulti) / sizeof(int);
+#endif
+
 //Failsafe keeped if failsafe command for 7s
 //If other mode than failsafe less than 2s and failsafe again, then total time for failsafe is keeped (no reset to 0)
 boolean allowFailSafeDisable(int rcFlightMode) {
@@ -39,13 +44,12 @@ void handleStableFlightMode() {
 
 //Read flight mode : ACRO / ATTI / GPS / FSAFE
 void checkFlightMode() {
-  uint32_t localtime = millis(); 
-  
+ unsigned long currtime=millis();
     //Manual
   if(pwmFlightMode < FLIGHTMODE_ACRO_PMW_HIG ) { //Real limite is 1180 - 1195
     if( allowFailSafeDisable(FLIGHTMODE_ACRO_MODE) ) {
         last_flightmode = flightmode = FLIGHTMODE_ACRO_MODE; //1=Acrobatic
-        total_timeNoFailSafe += (localtime - last_time);
+        total_timeNoFailSafe += (currtime - last_time);
     }
   }
 
@@ -53,7 +57,7 @@ void checkFlightMode() {
   if(pwmFlightMode >= FLIGHTMODE_ATTI_PMW_LOW && pwmFlightMode <FLIGHTMODE_ATTI_PMW_HIG) { //Real limite is 1510 - 1525
     if( allowFailSafeDisable(FLIGHTMODE_ATTI_MODE) ) {
         last_flightmode = flightmode = FLIGHTMODE_ATTI_MODE; //2=Alt Hold(Attitude)
-        total_timeNoFailSafe += (localtime - last_time);
+        total_timeNoFailSafe += (currtime - last_time);
     }
   } 
   
@@ -61,7 +65,7 @@ void checkFlightMode() {
   if(pwmFlightMode >= FLIGHTMODE_GPS_PMW_LOW ) { //Real limite is 1850 - 1865
     if( allowFailSafeDisable(FLIGHTMODE_GPS_MODE) ) {
         last_flightmode = flightmode = FLIGHTMODE_GPS_MODE; //5=Loiter(GPS Attitude)
-        total_timeNoFailSafe += (localtime - last_time);
+        total_timeNoFailSafe += (currtime - last_time);
     }
   } 
        
@@ -74,37 +78,70 @@ void checkFlightMode() {
      (pwmFlightMode >= FLIGHTMODE_ATTI_PMW_HIG && pwmFlightMode <FLIGHTMODE_GPS_PMW_LOW) || 
      (total_timeNoFailSafe == 0) ) {
     flightmode = FLIGHTMODE_FAIL_MODE; //6=Return to launch(Failsafe)
-    total_timeFailSafe += (localtime - last_time);
+    total_timeFailSafe += (currtime - last_time);
     total_timeNoFailSafe = 0;
   } 
 
-  last_time = localtime;
+  last_time = currtime;
 }
 
 //Read throttle percent
 void checkThrottle() {
-    float ret = rcDataSTD[THROTTLE_STD] - THROTTLE_PWM_MIN; //Throttle between [1000;2000] => 0 - 1000
+    float ret = throttle_pwm - THROTTLE_PWM_MIN; //Throttle between [1000;2000] => 0 - 1000
     ret = 100.0 * ret / (THROTTLE_PWM_MAX - THROTTLE_PWM_MIN);
-    throttlepercent = constrain(ret, 0, 100);
+    throttlepercent = constrain(ret, 0, 100);  
+    
+    //Switch battery capacity wtihin 20s after startup
+    #if defined(LIPO_CAPACITY_MAH_MULTI)
+      static unsigned long last_time=0;
+      static int compute_time=0;
+      static int lipo_capacity_position=0;
+      unsigned long currtime=millis();
+      
+      if( (flight_time < BATTERY_DISPLAY_FTIME) && (currtime-last_time > 50) ){
+        last_time=currtime;
+        if( panel_pwm > 1800 ) {
+          compute_time++;
+                          
+          if( compute_time > 10) {
+            lipo_capacity_position++;
+            compute_time=0;
+            if( lipo_capacity_position >= lipo_capacity_number ) {
+              lipo_capacity_position = 0;
+            }
+          }
+          
+          battery_capacity = lipoCapacityMulti[lipo_capacity_position];
+          
+          #if defined(DEBUG_SENSOR)
+            Serial.print("POS;");
+            Serial.print(lipo_capacity_position);
+            Serial.print(";CAPA;");
+            Serial.println(battery_capacity);
+          #endif
+        } else {
+          compute_time = 0;
+        }   
+      }     
+    #endif
 }
 
 //Read RSSI value
-void checkRSSI() {
-    float ret = analogValues[RSSI_PIN_ANALOG_POS];
-    #if !defined(RSSI_RAW_VAL) || RSSI_RAW_VAL != TRU
+void checkRSSI(uint16_t rssiAnalog) {
+    float ret = rssiAnalog;
+    #if !defined(RSSI_RAW_VAL)
       ret = min(ret, RSSI_MAX_VAL);
       ret = max(ret, RSSI_MIN_VAL);
       ret = abs(100.0 * (ret - RSSI_VAL_LOW)/ (RSSI_MAX_VAL - RSSI_MIN_VAL));
     #endif
 
-    RFinalUint.addValue(ret);
-    receiver_rssi = RFinalUint.getAverage(); 
+    receiver_rssi = ret; 
 }
 
 //Read voltage and current
-void checkBattVolt(){ 
+void checkBattVolt(uint16_t voltAnalog){ 
   //Voltage sensor
-  VRaw=analogValues[VOLT_PIN_ANALOG_POS];
+  VRaw=voltAnalog;
   
   #if defined(INTERNAL_VOLTAGE_REF)
     float Vcorrected = (VRaw * intervalVCC) / INTERNAL_VOLTAGE_REF;
@@ -113,16 +150,18 @@ void checkBattVolt(){
   #endif
   
   #if defined(VOLTAGE_THROTTLE_COMP) 
-    float pThottle = throttlepercent / 100;
+    float pThottle = throttlepercent / 100.0;
     Vcorrected = Vcorrected * (1 + VOLTAGE_THROTTLE_COMP * pThottle * pThottle * pThottle);
   #endif
   
   VFinalUint.addValue(Vcorrected);
   VFinal = VFinalUint.getAverage() / VOLTAGE_FACTOR;
+}
 
+void checkBattCurrent(uint16_t currentAnalog){ 
   //Current sensor 
   #if !defined(ESTIMATE_BATTERY_REMAINING) || ESTIMATE_BATTERY_REMAINING != ENABLED
-    IRaw=analogValues[CURR_PIN_ANALOG_POS];
+    IRaw=currentAnalog;
     
     #if defined(INTERNAL_VOLTAGE_REF)
       float Icorrected = (IRaw * intervalVCC) / INTERNAL_VOLTAGE_REF;
@@ -132,53 +171,16 @@ void checkBattVolt(){
     IFinalUint.addValue(Icorrected);
     IFinal = IFinalUint.getAverage() / CURRENT_FACTOR;
   #endif
-  
-  #if defined(DEBUG_SENSOR)
-	static unsigned long lastchecked=0;
-	if(millis()-lastchecked>1000){
-		Serial.print("Current voltage: ");
-		Serial.print(VFinal);
-                Serial.print("  <>  ");
-                Serial.print(VFinalUint.getAverage());
-                Serial.print("  <>  ");
-                Serial.println(intervalVCC);
-		
-                #if ESTIMATE_BATTERY_REMAINING == ENABLED
-		  Serial.print("Estimated pack remaining (%): ");
-		  Serial.println(estimatepower());
-                #else
-                  Serial.print("Current current: ");
-		  Serial.print(IFinal);
-                  Serial.print("  <>  ");
-                  Serial.print(IFinalUint.getAverage());
-                  Serial.print("  <>  ");
-                  Serial.println(intervalVCC);
-                #endif
-                Serial.println("----------------");
-		lastchecked=millis();
-	}
-  #endif
 }
 
-void updateCurrent(int delta){ //Interval between 2 calls, in ms
+void updateCurrent(unsigned long delta){ //Interval between 2 calls, in micros
 	//packsize is capacity in maH
 	//current present current in A
 	//delta is ms
-	float ma_ms = IFinal * delta; //(Consumption in A for delta ms, it's like consumption in mA for delta/1000 s)
-	float ma_hrs = ma_ms / 3600;
+	float ma_ms = IFinal * delta / 1000.0; //(Consumption in A for delta ms, it's like consumption in mA for delta/1000 s)
+	float ma_hrs = ma_ms / 3600.0;
 	mahout = mahout + ma_hrs;
-	capacity = constrain(LIPO_CAPACITY_MAH - mahout, 0, LIPO_CAPACITY_MAH);
-
-        #if defined(DEBUG_SENSOR)
-	static unsigned long lastchecked=0;
-	if(millis()-lastchecked>1000){
-		Serial.print("Consumption: ");
-		Serial.print(mahout);
-                Serial.print("  <> remaining: ");
-                Serial.println(capacity);
-		lastchecked=millis();
-	}
-        #endif
+	capacity = constrain(battery_capacity - mahout, 0, battery_capacity);
 }
 
 //Estimate remaining battery if not current sensor is used

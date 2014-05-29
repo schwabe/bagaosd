@@ -1,12 +1,13 @@
 #include <inttypes.h>
 #include "def.h"
-#include "vars.h"
 #include "config.h"
+#include "vars.h"
 #include <SendOnlySoftwareSerial.h> //Same as SoftwareSerial, but send only data. Used to send data to MinimOSD
-
+#include <eRCaGuy_Timer2_Counter.h>
 
 //#define DEBUG_SENSOR			//uncomment to enable debugging output to console and stop MAVLink messages from being transmitted
 //#define DEBUG_LOOP
+//#define DEBUG_FRSKY
 //#define DEBUG_GPS
 #include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 #include "RunningUintAverage.h" //For analog sensor
@@ -19,11 +20,10 @@
 #error Throttle not defined properly
 #endif
 
-
 //D8-D13 OK not used by PCINT2_vect, D0-D7 KO, used by PCINT2_vect (RX.ino) and Serial
 SendOnlySoftwareSerial minimosd(8);
 
-#if defined(FRSKY_PROTOCOL)
+#if defined(FRSKY_PROTOCOL) 
 SendOnlySoftwareSerial sendTelemetry(9, true);
 #endif
 
@@ -43,70 +43,87 @@ static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 int16_t rcDataSTD[RC_CHANS_STD];    // interval [1000;2000]
 int16_t rcDataPPM[RC_CHANS_PPM];    // interval [1000;2000]
 
+volatile int8_t cppm_loop=0;
+
 float VFinal = 0;
 float IFinal = 0;
 
 RunningUintAverage VFinalUint(VOLTAGE_BUFFER); //Average voltage
 RunningUintAverage IFinalUint(CURRENT_BUFFER); //Average current
-RunningUintAverage RFinalUint(RSSI_BUFFER); //Average RSSI
 
 void setup() {
-  configureReceiver();
-  minimosd.begin(57600); //For minimosd communication use standard Serial function
+  timer2.setup_T2(); //this MUST be done before the other Timer2_Counter functions work; Note: since this messes up PWM outputs on pins 3 & 11, as well as 
+                     //interferes with the tone() library (http://arduino.cc/en/reference/tone), you can always revert Timer2 back to normal by calling 
+                     //timer2.unsetup_T2()
+                     
+  configureReceiver();   
+  minimosd.begin(57600);            //For minimosd communication use standard Serial function
   
   //Different speed if decoding Naza Protocol or reading raw uBlox Data
-  #if defined(DECODE_NAZA_GPS) && DECODE_NAZA_GPS == TRUE
-    Serial.begin(115200);            //Decode Naza data at 115200 bauds
+  #if defined(DECODE_NAZA_GPS) 
+    Serial.begin(115200);           //Decode Naza data at 115200 bauds
   #else
     Serial.begin(57600);            //Raw reads (57600 bauds) GPS on RX, transmits output on TX
   #endif
 
-  #if defined(FRSKY_PROTOCOL)
+  #if defined(FRSKY_PROTOCOL) 
     sendTelemetry.begin(9600);
   #endif
   
   init_analog();
-  
-  VFinalUint.clear();
-  IFinalUint.clear();
 
   LEDPIN_PINMODE
   delay(1000);
 }
 
 void computeData() {
-    decode_gps();        //Compute GPS informations
-    analyseRC();         //Compute radio channel
-    checkRSSI();         //Compute RSSI
-    checkFlightMode();   //Compute Flight Mode
-    read_analog(millis());
-    checkBattVolt();     //Compute Voltage and Current
+    unsigned long mcurrtime = micros();
+    decode_gps();          //Compute GPS informations
+    
+    static unsigned long lastrc=0;
+    if(mcurrtime>lastrc){  // 500Hz
+      analyseRC();         //Compute radio channel
+      lastrc = mcurrtime + 2000;
+    }
+    
     checkThrottle();     //Compute thottle percent
-
+    checkFlightMode();   //Compute Flight Mode
+      
+    //Should be more than 27, because PPM Sum can be 27ms long
+    static unsigned long lastcomputetime;
+    if( mcurrtime > lastcomputetime ) {
+        handleStableFlightMode();
+        lastcomputetime = mcurrtime + 30000;
+    }
+    read_analog(mcurrtime);
+    
     #if !defined(ESTIMATE_BATTERY_REMAINING)
-      unsigned long currtime=millis();
       static unsigned long lastsample=0;
-      if(currtime-lastsample>50){
-        updateCurrent(currtime-lastsample); //Update current consumption, calculate battery remaining
-        lastsample = currtime;
+      if(mcurrtime-lastsample>20000){ //50Hz
+        updateCurrent(mcurrtime-lastsample); //Update current consumption, calculate battery remaining
+        lastsample = mcurrtime;
       }
     #endif
     
     sendMavlinkMessages();
-}
-
-void loop(){
-    computeData();   
+    
     #if defined(FRSKY_PROTOCOL)
       update_FrSky();
     #endif
+    //delay(10);
+}
+
+
+void loop(){
+    unsigned long currtime = millis();
+    computeData();   
+    
     
     #if defined(DEBUG_GPS)
-    unsigned long currtime_gps=millis();
     static unsigned long last_sent_current_time_gps=0;
 
-    if(currtime_gps - last_sent_current_time_gps > 500){
-      	last_sent_current_time_gps=currtime_gps;
+    if(currtime - last_sent_current_time_gps > 500){
+      	last_sent_current_time_gps=currtime;
         Serial.print("Lat: "); Serial.print(lat, 7);
         Serial.print(", Lon: "); Serial.print(lon, 7);
         Serial.print(", Alt: "); Serial.print(alt_m, 7);
@@ -116,84 +133,94 @@ void loop(){
     }
     #endif
     #if defined(DEBUG_LOOP)
-    unsigned long currtime=millis();
     static unsigned long last_sent_current_time=0;
 
     if(currtime - last_sent_current_time > 500){
       	last_sent_current_time=currtime;
-      	#if RC_PPM_MODE == ENABLED 
+      	#if defined(RC_PPM_MODE)
       	    Serial.print("PPM;");
-      	    Serial.print("THROTTLE : ");
+      	    Serial.print("TH:");
             Serial.print(rcDataPPM[THROTTLE_PPM]);
-            Serial.print(";");
-            Serial.print("FMODE : ");
+            Serial.print(":FM:");
             Serial.print(rcDataPPM[FMODE_PPM]);
-            Serial.print(";");
-            Serial.print("X1_PPM : ");
+            Serial.print(":X1:");
             Serial.print(rcDataPPM[X1_PPM]);
-            Serial.print(";");
-            Serial.print("X2_PPM : ");
+            Serial.print(":X2:");
             Serial.print(rcDataPPM[X2_PPM]);
-            Serial.print(";");
-            Serial.print("AUX4_PPM : ");
+            Serial.print(":AUX4:");
             Serial.print(rcDataPPM[AUX4_PPM]);
+            Serial.print(":CPPM:");
+            Serial.print(cppm_loop);
             Serial.print(";");
         #else
             Serial.print("STD;");
-            Serial.print("AUX CMD : ");
+            Serial.print("AUX:");
             Serial.print(rcDataSTD[AUX_STD]);
             Serial.print(";");
       	#endif
       	
       	//When PPM is used, THROTTLE / FMODE values are mapped to STD
       	Serial.print("COM;");
-  	Serial.print("THROTTLE : ");
+  	Serial.print("TH:");
         Serial.print(rcDataSTD[THROTTLE_STD]);
-        Serial.print(";");
-        Serial.print("FMODE : ");
-        Serial.print(rcDataSTD[FMODE_STD]);
-        Serial.print(";");
-        
+        Serial.print(":FM:");
+        Serial.print(rcDataSTD[FMODE_STD]);     
       	
       	
       	//Common values
-        Serial.print("GIMBALROLL : ");
+        Serial.print(":GR:");
         Serial.print(rcDataSTD[GIMBALROLL_STD]);
         Serial.print(":");
         Serial.print((long)ToDeg(roll_rad));
-        Serial.print(":");
-        Serial.print(";");
-        Serial.print("GIMBALPITCH : ");
+        Serial.print(":CP:");
         Serial.print(rcDataSTD[GIMBALPITCH_STD]);
         Serial.print(":");
         Serial.print((long)ToDeg(pitch_rad));
         Serial.print(":");
         Serial.println("");
         
-        Serial.print("Voltage : ");
+        Serial.print("VOLT:");
         Serial.print(long(VFinal*1000.0));
-        Serial.print(";");
-        Serial.print("Throttle : ");
+        Serial.print(":TH:");
         Serial.print(throttlepercent);
-        Serial.print(";");
-        Serial.print("Flight : ");
+        Serial.print(":FMODE:");
         Serial.print(flightmode);
-        /*Serial.print(";");
-        Serial.print("Last Flight : ");
-        Serial.print(last_flightmode);
-        Serial.print(";");
-        Serial.print("total_timeFailSafe : ");
-        Serial.print(total_timeFailSafe);
-        Serial.print(";");
-        Serial.print("total_timeNoFailSafe : ");
-        Serial.print(total_timeNoFailSafe);*/
         #if ESTIMATE_BATTERY_REMAINING == ENABLED
           Serial.println(" ");
 	  Serial.print("Estimated pack remaining (%): ");
 	  Serial.println(estimatepower());
         #endif
-        Serial.print(" RSSI : ");
-        Serial.println(receiver_rssi);
+        Serial.print(":RSSI:");
+        Serial.print(receiver_rssi);
+        Serial.print(":BATT:");
+        Serial.println(battery_capacity);
+        Serial.println("-");
+        
+        #if defined(DEBUG_SENSOR)
+        Serial.print("VOLT_LAST:");
+	Serial.print(VFinal);
+        Serial.print(":AVG:");
+        Serial.print(VFinalUint.getAverage());
+        Serial.print(":INT_VCC:");
+        Serial.print(intervalVCC);
+		
+        #if ESTIMATE_BATTERY_REMAINING == ENABLED
+	  Serial.print(":Estimated pack remaining (%): ");
+	  Serial.println(estimatepower());
+        #else
+          Serial.print(":CURR_LAST:");
+	  Serial.print(IFinal);
+          Serial.print(":AVG:");
+          Serial.print(IFinalUint.getAverage());
+          Serial.print(":INT_VCC:");
+          Serial.println(intervalVCC);
+        #endif
+        Serial.print("CONSO:");
+	Serial.print(mahout);
+        Serial.print("REMAINING:");
+        Serial.println(capacity);
+        Serial.println(" ");
+      #endif
     }
     #endif
     

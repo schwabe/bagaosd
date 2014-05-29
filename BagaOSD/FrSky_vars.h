@@ -25,8 +25,8 @@ unsigned char Frsky_Count_Order_Batt;
 long Frsky_Batt_Volt_A; 
 byte Batt_Cell_Detect=0;
 
-long f_curMillis;
-long f_preMillis;
+unsigned long f_curMillis;
+unsigned long f_preMillis;
 int f_delMillis = 200;
 // FrSky module addon - END
 

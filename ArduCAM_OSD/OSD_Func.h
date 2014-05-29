@@ -110,8 +110,13 @@ void setFdataVars(){
 //    tdistance = 0;
 //  }
 
+  //If no flight time (jittering), reset counter only
+  if(osd_throttle <10 && flight_time < 3000 ) {
+    flight_time = 0;
+    takeofftime = 0;
+  }
   //Copter specific "in flight" detection
-  if(osd_throttle > 15 ) {
+  if(osd_throttle > 10 ) {
     //Flight time when copter is about de move (there's some throttle)
     flight_time += (localtime - last_time);
    
@@ -128,6 +133,7 @@ void setFdataVars(){
   }
   //If it is stoped for more than 10 seconds, declare a landing
   else if(((localtime - not_moving_since) > 10000) && (landed == 4294967295) && (takeofftime == 1)){
+    
     landed = localtime;
   }
   //FTime = (millis()/1000); //Airmamaf wrong place
