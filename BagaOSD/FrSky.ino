@@ -56,8 +56,12 @@ s_gps_pos fr_lon;
 s_gps_pos fr_lat;
 
 #if defined(DEBUG_FRSKY)
+float ampbatt_data[6] = {35.6, 31.8, 40.8, 29.8,33.8,232.6};
+
 void test_values() {
     isArmed = 1;
+  
+  static int ampbatt_data_pos=0; 
   lon = 2.242697; //Ok frsky
   lat = 48.870494; //Ok frsky
   gpsFix=3; //T2 : OK (<255)
@@ -65,13 +69,15 @@ void test_values() {
   heading_d=200; //Cap : OK
   eph_cm = 154; //T1 : ok
   battery_remaining_A = 27; //Carb : ok
-  ampbatt_A = 0.6; //Cour : ok
+  ampbatt_A = ampbatt_data[ampbatt_data_pos]; //Cour : ok
   VFinal=15.8; //Ok frsky
   
   alt_Home_m = 60;
   alt_MSL_m=100; //Alt(ok)  Dist(ko), relative Alt (AltG)
   home_set=1;
   ground_speed_ms=15; //100:338 - 184 
+  ampbatt_data_pos++;
+  if (ampbatt_data_pos > 5) ampbatt_data_pos=0;
 }
 #endif
 
@@ -219,13 +225,14 @@ byte addPayload(byte DataID) {
       {
         unsigned int fr_eph = eph_cm;
         if( abs(fr_eph) > 9999) fr_eph = 9999;
+
         unsigned long currtime=millis();
-        //Display battery size before take off
+        //Display battery size before take off if LIPO_CAPACITY_MAH_MULTI is defined
         //Otherwise display battery size in alternance with eph (every 2s)
         if( (flight_time < BATTERY_DISPLAY_FTIME) || (((currtime/1000)%4)<2) ) {
           fr_eph = battery_capacity;
-        }        
-        
+        }   
+          
         fr_eph = convertTemperature(fr_eph);
         outBuff[payloadLen + 0] = 0x02; //Signed 16 bit data
         outBuff[payloadLen + 1] = lowByte(fr_eph);

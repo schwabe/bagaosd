@@ -47,13 +47,14 @@ void setHomeVars(OSD &osd)
   long bearing;
   
   osd_alt_to_home = (osd_alt - osd_home_alt);
+      
   //Check arm/disarm switching.
   if (motor_armed ^ last_armed){
     //If motors armed, reset home in Arducopter version
     osd_got_home = !motor_armed;
   }
   last_armed = motor_armed;
-  if(osd_got_home == 0 && osd_fix_type > 1){
+  if(osd_got_home == 0 && osd_fix_type > 2){//TODO : use home_position_set to set gps home
     osd_home_lat = osd_lat;
     osd_home_lon = osd_lon;
     //osd_alt_cnt = 0;
@@ -84,6 +85,10 @@ void setHomeVars(OSD &osd)
     dstlat = fabs(osd_home_lat - osd_lat) * 111319.5;
     dstlon = fabs(osd_home_lon - osd_lon) * 111319.5 * scaleLongDown;
     osd_home_distance = sqrt(sq(dstlat) + sq(dstlon));
+    
+    if( osd_home_distance * converth  > 99999 ) {
+        osd_home_distance = 99999 / converth;
+    }
 
     //DIR to Home
     dstlon = (osd_home_lon - osd_lon); //OffSet_X

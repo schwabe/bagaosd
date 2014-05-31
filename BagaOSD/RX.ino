@@ -48,7 +48,7 @@ ISR(RX_PC_INTERRUPT) { //this ISR is common to every receiver channel, it is cal
   pin = RX_PCINT_PIN_PORT; // RX_PCINT_PIN_PORT indicates the state of each PIN for the arduino port dealing with Ports digital pins
  
   mask = pin ^ PCintLast;          // doing a ^ between the current interruption and the last one indicates wich pin changed
-  cTime = timer2.get_T2_umicros(); //return a uint32_t, but it is not usefull to keep the whole bits => we keep only 16 bits
+  cTime = micros(); //timer2.get_T2_umicros(); //return a uint32_t, but it is not usefull to keep the whole bits => we keep only 16 bits
   sei();                           // re enable other interrupts at this point, the rest of this interrupt is not so time critical and can be interrupted safely
   PCintLast = pin;                 // we memorize the current state of all PINs [D0-D7]
 

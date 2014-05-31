@@ -15,6 +15,7 @@ static char strclear[]="\x20\x20\x20\x20\x20\x20\x20\x20";
 
 static uint32_t flight_time = 0; //Airmamaf flight time
 static uint32_t last_time = 0; //Airmamaf flight time
+boolean home_position_set=false;
 
 //static float	    nav_roll = 0; // Current desired roll in degrees
 //static float        nav_pitch = 0; // Current desired pitch in degrees

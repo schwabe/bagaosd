@@ -11,7 +11,11 @@ https://code.google.com/p/minimosd-extra/wiki/APM
 - 5hz for radio input or radio output data 
 
 **/
-
+#if defined(HOME_SET_PRECISION)
+float home_set_precision = HOME_SET_PRECISION;
+#else
+float home_set_precision = 0.2;
+#endif
 void sendMavlinkMessages() {
   unsigned long currtime=millis();
   
@@ -21,16 +25,22 @@ void sendMavlinkMessages() {
   static unsigned long heartbeat_5hz=0;
   static unsigned long dimming = 0;
   static float alt_MSL_m_last=0;
-  static unsigned long lasttime=0;
+
 
   mavlink_system.sysid = 100; // System ID, 1-255
   mavlink_system.compid = 50; // Component/Subsystem ID, 1-255
   
-  //Home can be set when GPS is 3D fix, and altitude is not changing (within 2m) for more than 1s
-  if(  (gpsFix < 3) || (abs(alt_MSL_m_last - alt_MSL_m) > 2 ) ) {
-    fix_time = currtime + 2000;
+  //Home can be set when GPS is 3D fix, and altitude is not changing (within 20cm) for more than 10s
+  if(  (gpsFix < 3) || (abs(alt_MSL_m_last - alt_MSL_m) > home_set_precision ) ) {
+    fix_time = currtime + 10000;
     alt_MSL_m_last = alt_MSL_m;
   } 
+  
+  #if defined(HOME_SET_AUTO_TIMEOUT)
+  if( (currtime/1000) > HOME_SET_AUTO_TIMEOUT ) {
+    fix_time = 0;
+  }
+  #endif
   
   //Set home altitude if not already set, and 3D fix and copter moving for more than 500ms
   if( (home_set == 0) && (currtime > fix_time) ) {
@@ -38,11 +48,17 @@ void sendMavlinkMessages() {
     home_set = 1;
   } 
   
-  if( isArmed ) {
-    flight_time += (currtime - lasttime);
-  } else {
-    if( flight_time < BATTERY_DISPLAY_FTIME) flight_time = 0;
-  }
+  #if defined(LIPO_CAPACITY_MAH_MULTI)
+    static unsigned long lasttime=0;
+  
+    if( throttlepercent > 30 && currtime > 5000) {
+      flight_time += (currtime - lasttime);
+    } else {
+      if( flight_time < BATTERY_DISPLAY_FTIME) flight_time = 0;
+    }
+    lasttime = currtime;
+  #endif
+  
   //1hz for mavlink heart beat
   if(currtime >= heartbeat_1hz ){
     sendHeartBeat();
@@ -136,8 +152,11 @@ void sendHeartBeat() {
   //flightmode 9 : Land
   //flightmode 10 : OF_Loiter
   
-  uint8_t mav_base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED | MAV_MODE_FLAG_GUIDED_ENABLED | MAV_MODE_FLAG_CUSTOM_MODE_ENABLED | MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
-  
+  uint8_t mav_base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED | MAV_MODE_FLAG_GUIDED_ENABLED | MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
+  //Custom flag used to indicate home altitude is set
+  if( home_set == 1 ) {
+    mav_base_mode |= MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
+  }
   //Consider copter armed when there's some throttle
   if( (throttlepercent > 10) ) {
     mav_base_mode = mav_base_mode | MAV_MODE_FLAG_SAFETY_ARMED;

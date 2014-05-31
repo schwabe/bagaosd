@@ -177,7 +177,8 @@ void updateCurrent(unsigned long delta){ //Interval between 2 calls, in micros
 	//packsize is capacity in maH
 	//current present current in A
 	//delta is ms
-	float ma_ms = IFinal * delta / 1000.0; //(Consumption in A for delta ms, it's like consumption in mA for delta/1000 s)
+        //float delta_ms = delta / 1000.0;
+	float ma_ms = IFinal * delta / 1000.0; //(Consumption in A for delta ms, it's like consumption in mA for delta s)
 	float ma_hrs = ma_ms / 3600.0;
 	mahout = mahout + ma_hrs;
 	capacity = constrain(battery_capacity - mahout, 0, battery_capacity);
