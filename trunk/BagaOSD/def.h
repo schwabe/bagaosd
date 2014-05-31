@@ -90,7 +90,7 @@ enum PPM_ORDERED_CHANNEL_COMPUTE {
 #define ANALOG_PIN_DEF_VAL   NO_ANALOG_PIN,NO_ANALOG_PIN,NO_ANALOG_PIN
 
 //Time in milli to display battery size, before take off
-#define BATTERY_DISPLAY_FTIME 2000
+#define BATTERY_DISPLAY_FTIME 1000
 
 //Internal buffer
 #define VOLTAGE_BUFFER             8   //Internal buffer to smooth voltage value

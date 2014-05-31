@@ -1,5 +1,5 @@
 //Send FrSky telemetry data  
-//#define FRSKY_PROTOCOL            //Send telemetry data to FrSky radio
+#define FRSKY_PROTOCOL            //Send telemetry data to FrSky radio
 //#define FRSKY_DMS               //DMS (48°N52'13.782) or NMEA (48°52.1378N) - Default NMEA
 //#define FRSKY_IMPERIALS         //Default Metrics
 //#define FRSKY_FLD02             //Uncomment if FLD_02 is used (leave commented for TARANIS)
@@ -12,7 +12,7 @@
 //#define RSSI_RAW_VAL               //Uncomment if you want to use raw RSSI value, instead of percent computed value
 
 //Radio receiver information
-//#define RC_PPM_MODE                //Uncomment to decode PPM Sum with arduino pin 2. This can be commented to use standard RX configuration instead of PPM Sum configuration.
+#define RC_PPM_MODE                //Uncomment to decode PPM Sum with arduino pin 2. This can be commented to use standard RX configuration instead of PPM Sum configuration.
 #define SERIAL_SUM_PPM             ROLL_PPM,PITCH_PPM,THROTTLE_PPM,YAW_PPM,X1_PPM,X2_PPM,FMODE_PPM,AUX4_PPM //Order of PPM channels
 
 //Sensor config
@@ -21,7 +21,7 @@
 
 //Voltage sensor
 #define VOLTAGE_PIN                A0    //Voltage sensor pin
-#define VOLTAGE_FACTOR             12.53 //Rise this value to lower voltage output value   
+#define VOLTAGE_FACTOR             12.87 //Rise this value to lower voltage output value   
 
 //Current sensor
 #define CURRENT_PIN                A3    //Current sensor pin
@@ -29,8 +29,8 @@
 
 //#define ESTIMATE_BATTERY_REMAINING  ENABLED   //Commented to use a current sensor, current sensor is not used if uncommented.
 #define LIPO_CELL                  4     //Number of cell, for estimate capacity (ESTIMATE_BATTERY_REMAINING)
-#define LIPO_CAPACITY_MAH          5000  //LIPO capacity in mah
-//#define LIPO_CAPACITY_MAH_MULTI    LIPO_CAPACITY_MAH,8000,10000  //LIPO capacity in mah selector
+#define LIPO_CAPACITY_MAH          8000  //LIPO capacity in mah
+#define LIPO_CAPACITY_MAH_MULTI    LIPO_CAPACITY_MAH,10000,5000  //LIPO capacity in mah selector
  
 //GPS Handler
 #define DECODE_NAZA_GPS            //Uncomment to decode Naza GPS Protocol - Comment and solder a wire on Naza GPS to decode RAW uBlox Message
@@ -49,7 +49,8 @@
 #define ROLL_LEVEL                 1500
 //#define ROLL_INVERT                //Uncomment if roll output is reversed (if horizon (/) is not the opposite (\) of the copter position)
 
-
+#define HOME_SET_PRECISION         0.2 //Precision to wait for 10s before setting altitude home (don't set lower than 0.1)
+#define HOME_SET_AUTO_TIMEOUT      90 //Home will be automatically set after 90s
 /**
 Standard receiver configuration
 Pin 2           :   Throttle

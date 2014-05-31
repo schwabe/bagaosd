@@ -45,8 +45,11 @@ int throttle_pwm=0;
 int roll_pwm=0;
 int pitch_pwm=0;
 int panel_pwm=0;
+#if defined(LIPO_CAPACITY_MAH_MULTI)
 unsigned long flight_time=0;
-
+#else
+unsigned long flight_time=BATTERY_DISPLAY_FTIME;
+#endif
 uint16_t battery_remaining_A = 0;
 float ampbatt_A = 0; //Conso courante
 

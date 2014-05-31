@@ -237,3 +237,15 @@ The following parameters were set in Naza for Gimbal output
 *Manual Control Speed*
 ||*Output*||*Gain*||
 ||Pitch (X1)||0||
+
+----
+=== Home altitude ===
+Define range precision in meter (20cm default) to stay in for 10s to set home altitude
+{{{
+#define HOME_SET_PRECISION         0.2
+}}}
+
+If home altitude couldn't be set with the previous method, after 90s, home altitude is set with the current altitude.
+{{{
+#define HOME_SET_AUTO_TIMEOUT      90
+}}}

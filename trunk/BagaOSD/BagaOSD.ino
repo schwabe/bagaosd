@@ -3,7 +3,6 @@
 #include "config.h"
 #include "vars.h"
 #include <SendOnlySoftwareSerial.h> //Same as SoftwareSerial, but send only data. Used to send data to MinimOSD
-#include <eRCaGuy_Timer2_Counter.h>
 
 //#define DEBUG_SENSOR			//uncomment to enable debugging output to console and stop MAVLink messages from being transmitted
 //#define DEBUG_LOOP
@@ -51,11 +50,7 @@ float IFinal = 0;
 RunningUintAverage VFinalUint(VOLTAGE_BUFFER); //Average voltage
 RunningUintAverage IFinalUint(CURRENT_BUFFER); //Average current
 
-void setup() {
-  timer2.setup_T2(); //this MUST be done before the other Timer2_Counter functions work; Note: since this messes up PWM outputs on pins 3 & 11, as well as 
-                     //interferes with the tone() library (http://arduino.cc/en/reference/tone), you can always revert Timer2 back to normal by calling 
-                     //timer2.unsetup_T2()
-                     
+void setup() {                     
   configureReceiver();   
   minimosd.begin(57600);            //For minimosd communication use standard Serial function
   
@@ -70,9 +65,10 @@ void setup() {
     sendTelemetry.begin(9600);
   #endif
   
-  init_analog();
+  computeIntervalVCC();
 
   LEDPIN_PINMODE
+
   delay(1000);
 }
 
@@ -95,7 +91,34 @@ void computeData() {
         handleStableFlightMode();
         lastcomputetime = mcurrtime + 30000;
     }
-    read_analog(mcurrtime);
+    
+    #if defined(RSSI_PIN_ANALOG) || defined(VOLTAGE_PIN) || defined(CURRENT_PIN)
+      static unsigned long lastsampleanalog=0;
+      static byte analog_selector=0;
+      if(mcurrtime-lastsampleanalog>10000){ //100Hz
+        switch (analog_selector) {
+          #if defined(RSSI_PIN_ANALOG)
+          case 0:
+            checkRSSI(analogRead(RSSI_PIN_ANALOG));
+          break;
+          #endif
+          #if defined(VOLTAGE_PIN)
+          case 1:
+            checkBattVolt(analogRead(VOLTAGE_PIN));
+          break;
+          #endif
+          #if defined(CURRENT_PIN)
+          case 2:
+            checkBattCurrent(analogRead(CURRENT_PIN));
+          break;
+          #endif
+        }
+  
+        lastsampleanalog = mcurrtime;
+        analog_selector++;
+        if( analog_selector > 2) analog_selector=0;
+      }
+    #endif
     
     #if !defined(ESTIMATE_BATTERY_REMAINING)
       static unsigned long lastsample=0;
@@ -110,7 +133,6 @@ void computeData() {
     #if defined(FRSKY_PROTOCOL)
       update_FrSky();
     #endif
-    //delay(10);
 }
 
 
@@ -190,6 +212,8 @@ void loop(){
 	  Serial.print("Estimated pack remaining (%): ");
 	  Serial.println(estimatepower());
         #endif
+        Serial.print(":FTIME:");
+        Serial.print(flight_time);
         Serial.print(":RSSI:");
         Serial.print(receiver_rssi);
         Serial.print(":BATT:");
