@@ -547,7 +547,7 @@ void panAlt(int first_col, int first_line){
 void panClimb(int first_col, int first_line){
     osd.setPanel(first_col, first_line);
     osd.openPanel();
-    int vs_calc = int(vs / 10.0) * 10.0;
+    float vs_calc = int(vs / 10.0) * 10.0;
     if (vs_calc > 9999) vs_calc = 9990;
     osd.printf("%c%4.0f%c%c", 0x15, vs_calc, climbchar, 0x20);
     osd.closePanel();
