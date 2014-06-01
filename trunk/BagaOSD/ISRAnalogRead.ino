@@ -1,12 +1,22 @@
+//VCC Internal
+boolean init_done = false;
+
 // ADC complete ISR
 ISR (ADC_vect) {
+    byte low, high;
     // we have to read ADCL first; doing so locks both ADCL
     // and ADCH until ADCH is read. reading ADCL second would
     // cause the results of each conversion to be discarded,
     // as ADCL and ADCH would be locked when it completed.
-    uint16_t adcReading = ADCL | (ADCH << 8);
+    low = ADCL;
+    high = ADCH;
 
-    intervalVCC = 1125300L / adcReading;  
+    if( !init_done) {
+      uint16_t adcReading = low | (high << 8);
+
+      intervalVCC = 1125300L / adcReading;  
+      init_done = true;
+    }
 } // end of ADC_vect
 
 void computeIntervalVCC() {

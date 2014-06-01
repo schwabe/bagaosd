@@ -10,8 +10,8 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 
 === BagaOSD ===
 || *Date* || *File* || *Size* || *Label* ||
-|| 31.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.2.zip BagaOSD_V3.2.zip]|| 587 Ko || Not to use||
-|| 29.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.1.zip BagaOSD_V3.1.zip]|| 594 Ko || Not to use||
+|| 01.06.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.2.1.zip BagaOSD_V3.2.1.zip]|| 587 Ko || Stable ||
+|| 29.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.1.zip BagaOSD_V3.1.zip]|| 594 Ko || For testing||
 || 08.05.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V3.0.zip BagaOSD_V3.0.zip]|| 774 Ko || Beta ||
 || 23.03.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.2.zip BagaOSD_V2.2.zip]|| 707 Ko || Stable ||
 || 14.02.2014 || [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip]|| 705 Ko || Beta ||
@@ -46,12 +46,13 @@ For [http://bagaosd.googlecode.com/svn/build/BagaOSD_V2.1.zip BagaOSD_V2.1.zip] 
 
 
 === Release Notes ===
-31.05.2014 - v3.2 ([http://code.google.com/p/bagaosd/source/detail?r=35 r35])
- * Majour Bug fix from v3.1, the way analogread was done with ISR wasn't a good idea, back to classic analogread.
+01.06.2014 - v3.2.1 ([http://code.google.com/p/bagaosd/source/detail?r=38 r38])
+ * Major Bug fix from v3.1, the way analogread was done with ISR wasn't a good idea, back to classic analogread.
  * New parameter to set home altitude
  * Symbol HA in MinimOSD is blinking when home altitude is not set (same thing with telemetry, with T2)
  * Put some crontrol in MinimOSD to avoid too big numbers for Home altitude, ground speed, climb speed
 
+ 
 29.05.2014 - v3.1 ([http://code.google.com/p/bagaosd/source/detail?r=29 r29])
  * Fix some few bugs (home altitude, better RX handling (less jerky))
  * Add the ability to change battery size before flight (!FrSky telemetry)
