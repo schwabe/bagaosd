@@ -4,7 +4,7 @@
 === !FrSky telemetry ===
 You can send telemetry data to your !FrSky receiver, and then receive those informations to your Taranis radio or your FLD_02 screen
 
-Uncomment this, if you wish to send !FrSky telemetry information (of course only working with !FrSky telemtry module)
+Uncomment this, if you wish to send !FrSky telemetry information (of course only working with !FrSky telemetry module)
 {{{
 #define FRSKY_PROTOCOL
 }}}
@@ -30,7 +30,7 @@ Uncomment if FLD_02 is used (leave commented for TARANIS)
 == Send telemetry data ==
 
 To send telemetry data, you have to connect arduino Pin 9 to RX pin of your !FrSky telemetry receiver.
-This was tested with Receiver D8R-XP and D8R-II plus, but it should work with any telemtry receiver.
+This was tested with Receiver D8R-XP and D8R-II plus, but it should work with any telemetry receiver.
 
 [http://bagaosd.googlecode.com/svn/files/arduino_frsky.png]
 
